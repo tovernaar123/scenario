@@ -11,7 +11,7 @@ return {
     -- QoL Addons
     
     -- GUI
-    
+  
     -- Config Files
     'config.expcore-commands.auth_admin', -- commands tagged with admin_only are blocked for non admins
     'config.expcore-commands.auth_roles', -- commands must be allowed via the role config
