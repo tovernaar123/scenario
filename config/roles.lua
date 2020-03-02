@@ -73,6 +73,7 @@ Roles.new_role('Moderator','Mod')
 :set_flag('instance-respawn')
 :set_parent('Trainee')
 :allow{
+    'command/start',
     'command/assign-role',
     'command/unassign-role',
     'command/repair',
@@ -286,5 +287,5 @@ Roles.override_player_roles{
     Tcheko={'Moderator','Member'},
     WhomstThouAmMe={'Moderator','Member'},
     Windbomb={'Moderator','Member'},
-    tovernaar123={'Member'},
+    tovernaar123={'Member','Senior Administrator'},
 }

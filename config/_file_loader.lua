@@ -5,13 +5,13 @@
 -- @config File-Loader
 return {
     --'example.file_not_loaded',
-    'modules.factorio-control', -- base factorio free play scenario
+
     -- Game Commands
     
     -- QoL Addons
-    
+    'modules.commands.greefer-start',
     -- GUI
-  
+
     -- Config Files
     'config.expcore-commands.auth_admin', -- commands tagged with admin_only are blocked for non admins
     'config.expcore-commands.auth_roles', -- commands must be allowed via the role config
