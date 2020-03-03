@@ -96,6 +96,13 @@ Permission_Groups.new_group('Guest')
     'activate_cut'
 }
 
+Permission_Groups.new_group('Voted_out')
+:disallow_all()
+:allow{
+    'start_walking',
+    'write_to_console'
+}
+
 Permission_Groups.new_group('Restricted')
 :disallow_all()
 :allow('write_to_console')

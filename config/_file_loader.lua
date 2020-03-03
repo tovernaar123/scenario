@@ -9,7 +9,7 @@ return {
     -- Game Commands
     
     -- QoL Addons
-    'modules.commands.greefer-start',
+    'modules.mini-games.greefer-start',
     -- GUI
 
     -- Config Files
