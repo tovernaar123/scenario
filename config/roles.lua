@@ -74,6 +74,7 @@ Roles.new_role('Moderator','Mod')
 :set_parent('Trainee')
 :allow{
     'command/start',
+    'command/add',
     'command/assign-role',
     'command/unassign-role',
     'command/repair',
