@@ -105,11 +105,11 @@ Commands.new_command('add','Command to add a greefer.')
                     local amount_tries = 100
                     for i = 1 ,amount_of_greefers do 
                         if amount_tries > 0 then    
-                            local random = math.round(math.random(1,#game.players))
+                            local random = math.random(1,#game.players)
                             local greefer = game.players[random]
                             if not has_value(greefers, greefer) then
                                 greefers[i] = greefer
-                                good_players[random] = nil
+                                table.remove( good_players, random )
                             else
                                 i = i-1
                                 amount_tries = amount_tries-1
@@ -236,4 +236,9 @@ function(event)
             end
         end
     end
+end)
+
+Event.add(defines.events.on_player_joined_game,
+function(event)
+    player.print("Welcome to the mini-game to start the game use /start (greefers time). \n Use vote to vote out players that you think are greefers. \n /add is used to add greefers at random. /time_left to see well the time left after the time is up the god-guys lose.   ")
 end)
