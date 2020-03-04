@@ -56,9 +56,13 @@ Commands.new_command('start','Command to start greefer game.')
     :add_param('time_in_min',false,'number')
     :register(
         function(player,amount_of_greefers,time,raw)
+            local online = #game.players
+            if online < amount_of_greefers then 
+                return Commands.error("Thats to many greefers.") 
+            end
+
             reset_all()
             is_started = true
-            greefers = {}
 
             Time = 60*60*time -- time in ticks
             for i, player in pairs(game.players) do
@@ -68,7 +72,7 @@ Commands.new_command('start','Command to start greefer game.')
             local amount_tries = 100
             for i = 1 ,amount_of_greefers do 
             if amount_tries > 0 then    
-                    local random = math.round(math.random(1,#game.players))
+                    local random = math.random(1,online)
                     local greefer = game.players[random]
                     if not has_value(greefers, greefer) then
                         greefers[i] = greefer
@@ -114,60 +118,53 @@ Commands.new_command('vote','Command to vote out the greefers.')
     :add_param('name_of_greefer',false)
     :register(
         function(player,name_of_greefer,raw)
-            if is_started then
-                if game.players[name_of_greefer] ~= nil then
-                    if  out[name_of_greefer] ~= true then 
-                        if out[player.name] ~= true then
-                            if who_voted[player.name] ~= nil then
-                                votes[who_voted[player.name]] = votes[who_voted[player.name]]-1
-                            end
-
-                            local voted = votes[name_of_greefer]
-                            if voted ~= nil then 
-                                voted = voted + 1
-                            else 
-                                voted = 1
-                            end
-
-                            votes[name_of_greefer] = voted
-                            who_voted[player.name] = name_of_greefer
-                            local required_votes = math.floor(#game.players)
-
-                            if votes[name_of_greefer] >= required_votes then
-
-                                local the_one = game.players[name_of_greefer]
-                                out[name_of_greefer] = true
-                                Permission_Groups.set_player_group(the_one,"Voted_out")
-                                if has_value(greefers,the_one) then
-                                    game.print(name_of_greefer.." Was a greefer and has been voted out! All votes have been reset.")
-                                else
-                                    game.print(name_of_greefer.." Was NOT a greefer but has been voted out! All votes have been reset.")
-                                end
-                                if cought > 1 then
-                                    game.print("Their are "..cought.." greefers left.")
-                                    cought = cought-1
-                                else 
-                                    game.print("Their are 0 greefers left VICTORY!")
-                                    reset_all()
-                                end
-                                votes = {}
-                                who_voted = {}
-                            else
-                                game.print(name_of_greefer.." has "..votes[name_of_greefer].." out of "..required_votes.." to be kicked.")
-                            end
-
-                        else
-                            return Commands.error("You cant vote when you are out.") 
-                        end
-
-                    else
-                        return Commands.error("This player is already out.") 
-                    end   
-                else 
-                    return Commands.error("Please use a in-game name for the parrameter.") 
-                end
-            else 
+            if  not is_started then
                 return Commands.error("The game is not started use /start (amountofgreefers time).") 
+            end
+            if game.players[name_of_greefer] == nil then
+                return Commands.error("Please use a in-game name for the parrameter.") 
+            end
+            if  out[name_of_greefer] ~= true then 
+                return Commands.error("This player is already out.") 
+            end
+            if out[player.name] == true then
+                return Commands.error("You cant vote when you are out.")
+            end
+            if who_voted[player.name] ~= nil then
+                votes[who_voted[player.name]] = votes[who_voted[player.name]]-1
+            end
+
+            local voted = votes[name_of_greefer]
+            if voted ~= nil then 
+                voted = voted + 1
+            else 
+                voted = 1
+            end
+
+            votes[name_of_greefer] = voted
+            who_voted[player.name] = name_of_greefer
+            local required_votes = math.round((#game.players-#out)/2)
+
+            if votes[name_of_greefer] >= required_votes then
+                local the_one = game.players[name_of_greefer]
+                out[name_of_greefer] = true
+                Permission_Groups.set_player_group(the_one,"Voted_out")
+                if has_value(greefers,the_one) then
+                    game.print(name_of_greefer.." Was a greefer and has been voted out! All votes have been reset.")
+                else
+                    game.print(name_of_greefer.." Was NOT a greefer but has been voted out! All votes have been reset.")
+                end
+                if cought > 1 then
+                    game.print("Their are "..cought.." greefers left.")
+                    cought = cought-1
+                else 
+                    game.print("Their are 0 greefers left VICTORY!")
+                    reset_all()
+                end
+                votes = {}
+                who_voted = {}
+            else
+                game.print(name_of_greefer.." has "..votes[name_of_greefer].." out of "..required_votes.." to be kicked.")
             end
         end)
 
