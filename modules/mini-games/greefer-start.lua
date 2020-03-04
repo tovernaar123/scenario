@@ -41,6 +41,16 @@ local function has_value (tab, val)
     return false
 end
 
+local function has_value_and_remove (tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            table.remove( tab, index )
+            return true
+        end
+    end
+    return false
+end
+
 local function tell_players()
     for i, player in ipairs(greefers) do
         player.print("You are the greefer, stop the good-guys from finishing the goal.")
@@ -54,8 +64,7 @@ end
 Commands.new_command('start','Command to start greefer game.')
     :add_param('amount_of_greefers',false,'number')
     :add_param('time_in_min',false,'number')
-    :register(
-        function(player,amount_of_greefers,time,raw)
+    :register(function(player,amount_of_greefers,time,raw)
             local online = #game.players
             if online < amount_of_greefers then 
                 return Commands.error("Thats to many greefers.") 
@@ -91,8 +100,7 @@ Commands.new_command('start','Command to start greefer game.')
 
 Commands.new_command('add','Command to add a greefer.')
         :add_param('amount_of_greefers',false,'number')
-        :register(
-            function(player,amount_of_greefers,raw)
+        :register(function(player,amount_of_greefers,raw)
                 if is_started then
                     local amount_tries = 100
                     for i = 1 ,amount_of_greefers do 
@@ -190,15 +198,42 @@ Commands.new_command('time_left','Command to call out a win for the good guys.')
         end
     end)
 
-Event.add(defines.events.on_tick, function(event)
+Event.add(defines.events.on_nth_tick, 
+function(event)
     if is_started then
-        Time = Time -1
+        Time = Time -5*60
         if Time < 1 then  
             game.print("The good-guys have lost, use /start to start a new round")
             for i, player in ipairs(greefers) do
                 game.print(player.name.." Was a greefer.")
             end
             reset_all()
+        end
+    end
+end)
+
+
+Event.add(defines.events.on_player_left_game,
+function(event)
+    local found_player = false
+    local  player_left = game.player[event.player_index]
+    if has_value_and_remove(good_players, player_left) then
+        found_player = true
+        game.print(player_left.name.." Was a good-guy")
+    else
+        for i, player in ipairs(greefers) do
+            if player == player_left then
+                found_player = true
+                table.remove(greefers,i)
+            end
+        end
+        game.print(player_left.name.." Was a GREEFER use /add to add a new greefer.")
+    end
+    if not found_player then 
+        for i, player in pairs(out) do
+            if i == player_left.name then
+                table.remove(out,i)
+            end
         end
     end
 end)
