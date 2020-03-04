@@ -73,7 +73,7 @@ Commands.new_command('start','Command to start greefer game.')
             reset_all()
             is_started = true
 
-            Time = 60*60*time -- time in ticks
+            Time = 3600*time -- time in ticks
             for i, player in pairs(game.players) do
                 good_players[i] = player 
             end
@@ -132,7 +132,7 @@ Commands.new_command('vote','Command to vote out the greefers.')
             if game.players[name_of_greefer] == nil then
                 return Commands.error("Please use a in-game name for the parrameter.") 
             end
-            if  out[name_of_greefer] ~= true then 
+            if  out[name_of_greefer] == true then 
                 return Commands.error("This player is already out.") 
             end
             if out[player.name] == true then
@@ -198,10 +198,10 @@ Commands.new_command('time_left','Command to call out a win for the good guys.')
         end
     end)
 
-Event.add(defines.events.on_nth_tick, 
+Event.add(defines.events.tick, 
 function(event)
     if is_started then
-        Time = Time -5*60
+        Time = Time -1
         if Time < 1 then  
             game.print("The good-guys have lost, use /start to start a new round")
             for i, player in ipairs(greefers) do
