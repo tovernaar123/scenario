@@ -73,22 +73,16 @@ Commands.new_command('start','Command to start greefer game.')
             --     good_players[i] = player 
             -- end
 
-            local not_done =  true
             local i = 1
 
-            while not_done do 
-                if i < amount_of_greefers then
-                    local random = math.random(1,online)
-                    local greefer = game.connected_player[random] 
-                    if not has_value(greefers, greefer) then
-                        i = i + 1
-                        greefers[i] = greefer
-                        -- good_players[random] = nil
-                    end
-                else 
-                    not_done = false;
+            while i < amount_of_greefers do 
+                local random = math.random(1,online)
+                local greefer = game.connected_player[random] 
+                if not has_value(greefers, greefer) then
+                  i = i + 1
+                  greefers[i] = greefer
                 end
-            end
+              end
 
             cought = #greefers
             tell_players()
@@ -99,20 +93,15 @@ Commands.new_command('add','Command to add a greefer.')
         :add_param('amount_of_greefers',false,'number')
         :register(function(player,amount_of_greefers,raw)
                 if is_started then
-                    local not_done =  true
                     local i = 1
-                    while not_done do 
-                        if i < amount_of_greefers then
-                            local random = math.random(1,online)
-                            local greefer = game.connected_player[random] 
-                            if not has_value(greefers, greefer) then
-                                i = i + 1
-                                greefers[i] = greefer
-                            end
-                        else 
-                            not_done = false;
+                    while i < amount_of_greefers do 
+                        local random = math.random(1,#game.connected_player)
+                        local greefer = game.connected_player[random] 
+                        if not has_value(greefers, greefer) then
+                          i = i + 1
+                          greefers[i] = greefer
                         end
-                    end
+                      end
                     tell_players()
                 else 
                     return Commands.error("Please use /start first.")
