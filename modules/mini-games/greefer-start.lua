@@ -198,10 +198,11 @@ Commands.new_command('time_left','Command to call out a win for the good guys.')
         end
     end)
 
-Event.add(defines.events.tick, 
-function(event)
+-- Event.add(defines.events.tick, 
+
+Event.on_nth_tick(300,function(event)
     if is_started then
-        Time = Time -1
+        Time = Time -300
         if Time < 1 then  
             game.print("The good-guys have lost, use /start to start a new round")
             for i, player in ipairs(greefers) do
@@ -211,7 +212,6 @@ function(event)
         end
     end
 end)
-
 
 Event.add(defines.events.on_player_left_game,
 function(event)
