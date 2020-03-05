@@ -6,6 +6,7 @@
 return {
     --'example.file_not_loaded',
     'modules.commands.roles',
+    'modules.commands.debug',
     -- Game Commands
     
     -- QoL Addons
