@@ -122,7 +122,7 @@ Commands.new_command('add','Command to add a greefer.')
                 end
             end)
 
-Commands.new_command('vote','Command to vote out the greefers.')
+Commands.new_command('vote','Use /vote to vote out players that you think are greefers.')
     :add_param('name_of_greefer',false)
     :register(
         function(player,name_of_greefer,raw)
