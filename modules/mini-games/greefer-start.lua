@@ -4,7 +4,7 @@ local Permission_Groups = require 'expcore.permission_groups'
 require 'config.expcore-commands.parse_general'
 
 local greefers = {}
-local good_players = {}
+--local good_players = {}
 local is_started = false
 local votes = {}
 local who_voted = {}
@@ -16,13 +16,12 @@ local Time = 0
 local function reset_all()
     is_started = false
     greefers = {}
-    good_players = {}
     votes = {}
     who_voted = {}
     out = {}
     cought = 0
     Time = 0
-    for i, player in pairs(game.players) do
+    for i, player in pairs(game.connected_player) do
         if player.admin then
             Permission_Groups.set_player_group(player,"Admin") 
         else
@@ -52,12 +51,16 @@ local function has_value_and_remove (tab, val)
 end
 
 local function tell_players()
+    local done = {}
     for i, player in ipairs(greefers) do
-        player.print("You are the greefer, stop the good-guys from finishing the goal.")
+      done[player.index] = true
+      player.print("You are the greefer, stop the good-guys from finishing the goal.")
     end
-
-    for i, player in ipairs(good_players) do
+    
+    for index,player in pairs(game.connected_player) do
+      if not done[index] then
         player.print("You are a good-guy, finish the goal.")
+      end
     end
 end
 
@@ -65,7 +68,7 @@ Commands.new_command('start','Command to start greefer game.')
     :add_param('amount_of_greefers',false,'number')
     :add_param('time_in_min',false,'number')
     :register(function(player,amount_of_greefers,time,raw)
-            local online = #game.players
+            local online = #game.connected_player
             if online < amount_of_greefers then 
                 return Commands.error("Thats to many greefers.") 
             end
@@ -74,9 +77,9 @@ Commands.new_command('start','Command to start greefer game.')
             is_started = true
 
             Time = 3600*time -- time in ticks
-            for i, player in pairs(game.players) do
-                good_players[i] = player 
-            end
+            -- for i, player in pairs(game.connected_player) do
+            --     good_players[i] = player 
+            -- end
 
             local not_done =  true
             local i = 1
@@ -84,12 +87,14 @@ Commands.new_command('start','Command to start greefer game.')
             while not_done do 
                 if i < amount_of_greefers then
                     local random = math.random(1,online)
-                    local greefer = game.players[random] 
+                    local greefer = game.connected_player[random] 
                     if not has_value(greefers, greefer) then
                         i = i + 1
                         greefers[i] = greefer
-                        good_players[random] = nil
+                        -- good_players[random] = nil
                     end
+                else 
+                    not_done = false;
                 end
             end
 
@@ -105,11 +110,11 @@ Commands.new_command('add','Command to add a greefer.')
                     local amount_tries = 100
                     for i = 1 ,amount_of_greefers do 
                         if amount_tries > 0 then    
-                            local random = math.random(1,#game.players)
-                            local greefer = game.players[random]
+                            local random = math.random(1,#game.connected_player)
+                            local greefer = game.connected_player[random]
                             if not has_value(greefers, greefer) then
                                 greefers[i] = greefer
-                                table.remove( good_players, random )
+                                --table.remove( good_players, random )
                             else
                                 i = i-1
                                 amount_tries = amount_tries-1
@@ -129,7 +134,7 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
             if  not is_started then
                 return Commands.error("The game is not started use /start (amountofgreefers time).") 
             end
-            if game.players[name_of_greefer] == nil then
+            if game.connected_player[name_of_greefer] == nil then
                 return Commands.error("Please use a in-game name for the parrameter.") 
             end
             if  out[name_of_greefer] == true then 
@@ -151,10 +156,10 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
 
             votes[name_of_greefer] = voted
             who_voted[player.name] = name_of_greefer
-            local required_votes = math.round((#game.players-#out)/2)
+            local required_votes = math.round((#game.connected_player-#out)/2)
 
             if votes[name_of_greefer] >= required_votes then
-                local the_one = game.players[name_of_greefer]
+                local the_one = game.connected_player[name_of_greefer]
                 out[name_of_greefer] = true
                 Permission_Groups.set_player_group(the_one,"Voted_out")
                 if has_value(greefers,the_one) then
@@ -217,24 +222,23 @@ Event.add(defines.events.on_player_left_game,
 function(event)
     local found_player = false
     local  player_left = game.player[event.player_index]
-    if has_value_and_remove(good_players, player_left) then
-        found_player = true
-        game.print(player_left.name.." Was a good-guy")
-    else
-        for i, player in ipairs(greefers) do
-            if player == player_left then
-                found_player = true
-                table.remove(greefers,i)
-            end
+    for i, player in ipairs(greefers) do
+        if player == player_left then
+            found_player = true
+            game.print(player_left.name" Was a greefer!")
         end
-        game.print(player_left.name.." Was a GREEFER use /add to add a new greefer.")
     end
     if not found_player then 
         for i, player in pairs(out) do
             if i == player_left.name then
                 table.remove(out,i)
+                found_player = true
+                game.print(player_left.name.." Was out.")
             end
         end
+    end
+    if not found_player then 
+        game.print(player_left.name.." Was a good guy.")
     end
 end)
 
