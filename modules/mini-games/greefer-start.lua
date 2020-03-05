@@ -116,7 +116,6 @@ Commands.new_command('add','Command to add a greefer.')
                             if not has_value(greefers, greefer) then
                                 i = i + 1
                                 greefers[i] = greefer
-                                -- good_players[random] = nil
                             end
                         else 
                             not_done = false;
