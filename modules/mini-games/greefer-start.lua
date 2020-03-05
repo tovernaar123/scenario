@@ -107,18 +107,19 @@ Commands.new_command('add','Command to add a greefer.')
         :add_param('amount_of_greefers',false,'number')
         :register(function(player,amount_of_greefers,raw)
                 if is_started then
-                    local amount_tries = 100
-                    for i = 1 ,amount_of_greefers do 
-                        if amount_tries > 0 then    
-                            local random = math.random(1,#game.connected_player)
-                            local greefer = game.connected_player[random]
+                    local not_done =  true
+                    local i = 1
+                    while not_done do 
+                        if i < amount_of_greefers then
+                            local random = math.random(1,online)
+                            local greefer = game.connected_player[random] 
                             if not has_value(greefers, greefer) then
+                                i = i + 1
                                 greefers[i] = greefer
-                                --table.remove( good_players, random )
-                            else
-                                i = i-1
-                                amount_tries = amount_tries-1
+                                -- good_players[random] = nil
                             end
+                        else 
+                            not_done = false;
                         end
                     end
                     tell_players()
