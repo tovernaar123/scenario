@@ -240,5 +240,6 @@ end)
 
 Event.add(defines.events.on_player_joined_game,
 function(event)
+    local  player = game.player[event.player_index]
     player.print("Welcome to the mini-game to start the game use /start (greefers time). \n Use vote to vote out players that you think are greefers. \n /add is used to add greefers at random. /time_left to see well the time left after the time is up the god-guys lose.   ")
 end)
