@@ -223,7 +223,7 @@ function(event)
     if not found_player then 
         for i, player in pairs(out) do
             if i == player_left.name then
-                table.remove(out,i)
+                table.fast_remove(out,i)
                 found_player = true
                 game.print(player_left.name.." Was out.")
             end
