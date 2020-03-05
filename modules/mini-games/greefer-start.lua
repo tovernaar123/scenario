@@ -13,6 +13,7 @@ local cought =0
 local Time = 0
 
 
+
 local function reset_all()
     is_started = false
     greefers = {}
@@ -55,6 +56,25 @@ local function tell_players()
       end
     end
 end
+
+
+
+local Global = require 'utils.global'
+Global.register({
+  is_started = is_started, 
+  votes = votes,
+  who_voted = who_voted, 
+  out = out, 
+  cought = cought, 
+  Time = Time,
+},function(tbl)
+  is_started = tbl.is_started 
+  votes = tbl.votes 
+  who_voted = tbl.who_voted 
+  out = tbl.out 
+  cought = tbl.cought 
+  Time = tbl.Time
+end)
 
 Commands.new_command('start','Command to start greefer game.')
     :add_param('amount_of_greefers',false,'number')
