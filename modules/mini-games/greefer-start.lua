@@ -40,15 +40,7 @@ local function has_value (tab, val)
     return false
 end
 
-local function has_value_and_remove (tab, val)
-    for index, value in ipairs(tab) do
-        if value == val then
-            table.remove( tab, index )
-            return true
-        end
-    end
-    return false
-end
+
 
 local function tell_players()
     local done = {}
