@@ -5,7 +5,7 @@
 -- @config File-Loader
 return {
     --'example.file_not_loaded',
-
+    'modules.commands.roles',
     -- Game Commands
     
     -- QoL Addons
