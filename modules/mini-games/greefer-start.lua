@@ -79,6 +79,7 @@ Commands.new_command('start','Command to start greefer game.')
     :add_param('time_in_min',false,'number')
     :register(function(player,amount_of_greefers,time,raw)
             local online = #game.connected_players
+            game.print(online)
             if online < amount_of_greefers then 
                 return Commands.error("Thats to many greefers.") 
             end
@@ -91,12 +92,13 @@ Commands.new_command('start','Command to start greefer game.')
             --     good_players[i] = player 
             -- end
 
-            local i = 1
+            local i = 0
 
             while i < amount_of_greefers do 
-                local greefer
+                local random = math.random(1,online)
+                local greefer = game.players[random]
                 while not greefer.connected do
-                    local random = math.random(1,online)
+                    random = math.random(1,online)
                     greefer = game.players[random] 
                 end
                 if not has_value(greefers, greefer) then
@@ -115,16 +117,18 @@ Commands.new_command('add','Command to add a greefer.')
         :register(function(player,amount_of_greefers,raw)
                 if Table_for_varibaibels[1] then
                     local online = #game.connected_players
-                    local i = 1
+                    local i = 0
+
                     while i < amount_of_greefers do 
-                        local greefer
+                        local random = math.random(1,online)
+                        local greefer = game.players[random]
                         while not greefer.connected do
-                            local random = math.random(1,online)
+                            random = math.random(1,online)
                             greefer = game.players[random] 
                         end
                         if not has_value(greefers, greefer) then
-                          i = i + 1
-                          greefers[i] = greefer
+                            i = i + 1
+                            greefers[i] = greefer
                         end
                     end
                     tell_players()
@@ -140,7 +144,7 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
             if  not Table_for_varibaibels[1] then
                 return Commands.error("The game is not started use /start (amountofgreefers time).") 
             end
-            if game.players[name_of_greefer] and game.players[name_of_greefer].connected then
+            if not game.players[name_of_greefer] or  not game.players[name_of_greefer].connected then
                 return Commands.error("Please use a in-game name for the parrameter.") 
             end
             if  out[name_of_greefer] == true then 
