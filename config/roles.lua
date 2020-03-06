@@ -74,6 +74,7 @@ Roles.new_role('Moderator','Mod')
 :set_parent('Trainee')
 :allow{
     'command/win',
+    'command/clear_votes',
     'command/start',
     'command/add',
     'command/assign-role',
@@ -207,6 +208,7 @@ local default = Roles.new_role('Guest','')
 :set_permission_group('Guest')
 :set_custom_color{r=185,g=187,b=160}
 :allow{
+    'command/all_votes',
     'command/time_left',
     'command/vote',
     'command/tag',
