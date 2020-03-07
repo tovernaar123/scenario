@@ -75,7 +75,7 @@ Global.register({
   who_voted = who_voted, 
   out = out,  
 },function(tbl)
-  Table_for_varibaibels = Table_for_varibaibels.is_started 
+  Table_for_varibaibels = tbl.Table_for_varibaibels
   votes = tbl.votes 
   who_voted = tbl.who_voted 
   out = tbl.out  
