@@ -2,28 +2,35 @@ local Commands = require 'expcore.commands'
 local Event = require 'utils.event' --- @dep utils.event
 local Permission_Groups = require 'expcore.permission_groups'
 require 'config.expcore-commands.parse_general'
+--[[
+    This is the code for the greefer game.
+    In short their are a number of greefer that need to stop the good-guys for finishing the goal.
+    But the greefer shood be suttle as they can be voted out bye anyone with /vote.
+    To start the game smiply do /start number_of_greefers time_to_reach_goal.
+--]]
 
-local greefers = {}
---local good_players = {}
-local votes = {}
-local who_voted = {}
-local out = {}
+
+
+local greefers = {} --all the greefers
+local votes = {} --all the votes
+local who_voted = {} --the people who voted
+local out = {} -- all the players that were voted out
 
 
 local Table_for_varibaibels = { 
-    false,      -- 1 Table_for_varibaibels[1]
-    0,          -- Time
-    0,          --cought
-} 
+    started = false, --Check if /start has been used.
+    Time = 0, --The time left in ticks.
+    cought = 0, -- Used to determine how many players where found to be greefer.
+}
 
-local function reset_all()
-    Table_for_varibaibels[1] = false
+local function reset_all() -- Resets all tables and vars so /start can be used again.
+    Table_for_varibaibels["started"] = false
     greefers = {}
     votes = {}
     who_voted = {}
     out = {}
-    Table_for_varibaibels[3] = 0
-    Table_for_varibaibels[2] = 0
+    Table_for_varibaibels["cought"] = 0
+    Table_for_varibaibels["Time"] = 0
     for i, player in pairs(game.connected_players) do
         if player.admin then
             Permission_Groups.set_player_group(player,"Admin") 
@@ -34,7 +41,7 @@ local function reset_all()
     
 end
 
-local function has_value (tab, val)
+local function has_value (tab, val) -- Checks if a table has a value.
     for index, value in ipairs(tab) do
         if value == val then
             return true
@@ -45,7 +52,7 @@ end
 
 
 
-local function tell_players()
+local function tell_players() --Tells the players if they are greefer or a good-guy.
     local done = {}
     for i, player in ipairs(greefers) do
       done[player.index] = true
@@ -61,7 +68,7 @@ end
 
 
 
-local Global = require 'utils.global'
+local Global = require 'utils.global' --Used to prevent desynicing.
 Global.register({
   Table_for_varibaibels = Table_for_varibaibels, 
   votes = votes,
@@ -74,7 +81,7 @@ Global.register({
   out = tbl.out  
 end)
 
-Commands.new_command('start','Command to start greefer game.')
+Commands.new_command('start','Command to start greefer game.') --Used to start the game (always needs to be run first).
     :add_param('amount_of_greefers',false,'number')
     :add_param('time_in_min',false,'number')
     :register(function(player,amount_of_greefers,time,raw)
@@ -85,9 +92,9 @@ Commands.new_command('start','Command to start greefer game.')
             end
 
             reset_all()
-            Table_for_varibaibels[1] = true
+            Table_for_varibaibels["started"] = true
 
-            Table_for_varibaibels[2] = 3600*time -- time in ticks
+            Table_for_varibaibels["Time"] = 3600*time -- time in ticks
             -- for i, player in pairs(game.connected_player) do
             --     good_players[i] = player 
             -- end
@@ -96,36 +103,28 @@ Commands.new_command('start','Command to start greefer game.')
 
             while i < amount_of_greefers do 
                 local random = math.random(1,online)
-                local greefer = game.players[random]
-                while not greefer.connected do
-                    random = math.random(1,online)
-                    greefer = game.players[random] 
-                end
+                local greefer = game.connected_players[random]
                 if not has_value(greefers, greefer) then
                   i = i + 1
                   greefers[i] = greefer
                 end
             end
 
-            Table_for_varibaibels[3] = #greefers
+            Table_for_varibaibels["cought"] = #greefers
             tell_players()
 
         end)
 
-Commands.new_command('add','Command to add a greefer.')
+Commands.new_command('add','Command to add a greefer.') --Adds a greefer (admin only).
         :add_param('amount_of_greefers',false,'number')
         :register(function(player,amount_of_greefers,raw)
-                if Table_for_varibaibels[1] then
+                if Table_for_varibaibels["started"] then
                     local online = #game.connected_players
                     local i = 0
 
                     while i < amount_of_greefers do 
                         local random = math.random(1,online)
-                        local greefer = game.players[random]
-                        while not greefer.connected do
-                            random = math.random(1,online)
-                            greefer = game.players[random] 
-                        end
+                        local greefer = game.connected_players[random]
                         if not has_value(greefers, greefer) then
                             i = i + 1
                             greefers[i] = greefer
@@ -137,11 +136,12 @@ Commands.new_command('add','Command to add a greefer.')
                 end
             end)
 
+--Used to vote peopol out.
 Commands.new_command('vote','Use /vote to vote out players that you think are greefers.')
     :add_param('name_of_greefer',false)
     :register(
         function(player,name_of_greefer,raw)
-            if  not Table_for_varibaibels[1] then
+            if  not Table_for_varibaibels["started"] then
                 return Commands.error("The game is not started use /start (amountofgreefers time).") 
             end
             if not game.players[name_of_greefer] or  not game.players[name_of_greefer].connected then
@@ -153,8 +153,9 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
             if out[player.name] == true then
                 return Commands.error("You cant vote when you are out.")
             end
-            if who_voted[player.name] ~= nil then
-                votes[who_voted[player.name]] = votes[who_voted[player.name]]-1
+            local who = who_voted[player.name]
+            if who ~= nil then
+                votes[who] = votes[who] - 1
             end
 
             local voted = votes[name_of_greefer]
@@ -177,11 +178,11 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
                 else
                     game.print(name_of_greefer.." Was NOT a greefer but has been voted out! All votes have been reset.")
                 end
-                if Table_for_varibaibels[3] > 1 then
-                    game.print("Their are "..Table_for_varibaibels[3].." greefers left.")
-                    Table_for_varibaibels[3] = Table_for_varibaibels[3]-1
+                if Table_for_varibaibels["cought"] > 1 then
+                    game.print("Their are "..Table_for_varibaibels["cought"].." greefers left.")
+                    Table_for_varibaibels["cought"] = Table_for_varibaibels["cought"]-1
                 else 
-                    game.print("Their are 0 greefers left VICTORY!")
+                    game.print("Their are 0 greefers left VICTORY, Their where".. math.ceil(Table_for_varibaibels["Time"]/3600).." Minutes left.")
                     reset_all()
                 end
                 votes = {}
@@ -191,9 +192,10 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
             end
         end)
 
+--Used to win the game after goal has been done (admin only).
 Commands.new_command('win','Command to call out a win for the good guys.')
     :register(function(player,raw)
-        if Table_for_varibaibels[1] then
+        if Table_for_varibaibels["started"] then
             game.print("VICTORY!!!, the greefers where:")
             for i, player in ipairs(greefers) do
                 game.print(player.name)
@@ -204,15 +206,17 @@ Commands.new_command('win','Command to call out a win for the good guys.')
         end
     end)
 
+--Shows the time left.
 Commands.new_command('time_left','Command to call out a win for the good guys.')
     :register(function(player,raw)
-        if Table_for_varibaibels[1] then
-            player.print("You have "..tostring(math.round(Table_for_varibaibels[2]/3600)).." more minutes.")
+        if Table_for_varibaibels["started"] then
+            player.print("You have "..math.ceil(Table_for_varibaibels["Time"]/3600).." more minutes.")
         else 
             return Commands.error("The game is not started use /start (amountofgreefers time).") 
         end
     end)
 
+--Shows all votes.
 Commands.new_command('all_votes','Command to see all votes.')
     :register(function(player,raw)
         for i,num in pairs(votes) do
@@ -220,18 +224,19 @@ Commands.new_command('all_votes','Command to see all votes.')
         end
 
     end)
-
+--Clears all votes.
 Commands.new_command('clear_votes','Command to clear all votes.')
     :register(function(player,raw)
         votes = {}
+        who_voted = {}
 
     end)
 
-    
+--Handles time and print when time is up.    
 Event.on_nth_tick(300,function(event)
-    if Table_for_varibaibels[1] then
-        Table_for_varibaibels[2] = Table_for_varibaibels[2] -300
-        if Table_for_varibaibels[2] < 1 then  
+    if Table_for_varibaibels["started"] then
+        Table_for_varibaibels["Time"] = Table_for_varibaibels["Time"] -300
+        if Table_for_varibaibels["Time"] < 1 then  
             game.print("The good-guys have lost, use /start to start a new round")
             for i, player in ipairs(greefers) do
                 game.print(player.name.." Was a greefer.")
@@ -241,6 +246,7 @@ Event.on_nth_tick(300,function(event)
     end
 end)
 
+--runs when player leaves.
 Event.add(defines.events.on_player_left_game,
 function(event)
     local found_player = false
@@ -263,8 +269,20 @@ function(event)
     if not found_player then 
         game.print(player_left.name.." Was a good guy.")
     end
+
+    local who = who_voted[player_left.name]
+    if who ~= nil then
+        votes[who] = votes[who] - 1
+        who_voted[player_left.name] = nil
+    end
+
+    
+
+
+
 end)
 
+--runs when player joins
 Event.add(defines.events.on_player_joined_game,
 function(event)
     local  player = game.players[event.player_index]
