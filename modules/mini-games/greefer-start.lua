@@ -129,6 +129,7 @@ Commands.new_command('add','Command to add a greefer.') --Adds a greefer (admin 
                         if not has_value(greefers, greefer) then
                             i = i + 1
                             greefers[i] = greefer
+                            Table_for_varibaibels["cought"] = Table_for_varibaibels["cought"] +1
                         end
                     end
                     tell_players()
@@ -176,15 +177,15 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
                 Permission_Groups.set_player_group(the_one,"Voted_out")
                 if has_value(greefers,the_one) then
                     game.print(name_of_greefer.." Was a greefer and has been voted out! All votes have been reset.")
+                    if Table_for_varibaibels["cought"] > 1 then
+                        game.print("Their are "..Table_for_varibaibels["cought"].." greefers left.")
+                        Table_for_varibaibels["cought"] = Table_for_varibaibels["cought"]-1
+                    else 
+                        game.print("Their are 0 greefers left VICTORY, Their where".. math.ceil(Table_for_varibaibels["Time"]/3600).." Minutes left.")
+                        reset_all()
+                    end
                 else
                     game.print(name_of_greefer.." Was NOT a greefer but has been voted out! All votes have been reset.")
-                end
-                if Table_for_varibaibels["cought"] > 1 then
-                    game.print("Their are "..Table_for_varibaibels["cought"].." greefers left.")
-                    Table_for_varibaibels["cought"] = Table_for_varibaibels["cought"]-1
-                else 
-                    game.print("Their are 0 greefers left VICTORY, Their where".. math.ceil(Table_for_varibaibels["Time"]/3600).." Minutes left.")
-                    reset_all()
                 end
                 votes = {}
                 who_voted = {}
@@ -255,13 +256,14 @@ function(event)
     for i, player in ipairs(greefers) do
         if player == player_left then
             found_player = true
+            Table_for_varibaibels["cought"] = Table_for_varibaibels["cought"] -1
             game.print(player_left.name" Was a greefer!")
         end
     end
     if not found_player then 
         for i, player in pairs(out) do
             if i == player_left.name then
-                table.fast_remove(out,i)
+                out[i] = nil
                 found_player = true
                 game.print(player_left.name.." Was out.")
             end
