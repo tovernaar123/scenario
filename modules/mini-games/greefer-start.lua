@@ -74,13 +74,14 @@ Global.register({
   votes = votes,
   who_voted = who_voted, 
   out = out,  
+  greefers = greefers,
 },function(tbl)
   Table_for_varibaibels = tbl.Table_for_varibaibels
   votes = tbl.votes 
   who_voted = tbl.who_voted 
   out = tbl.out  
+  greefers = tbl.greefers
 end)
-
 Commands.new_command('start','Command to start greefer game.') --Used to start the game (always needs to be run first).
     :add_param('amount_of_greefers',false,'number')
     :add_param('time_in_min',false,'number')
