@@ -23,6 +23,15 @@ local Table_for_varibaibels = {
     cought = 0, -- Used to determine how many players where found to be griefer.
 }
 
+local function checknumber(num)
+    if type(num) == "number" then
+        return true
+    else
+        return false
+    end
+end
+
+
 local function reset_all() -- Resets all tables and vars so /start can be used again.
     Table_for_varibaibels["started"] = false
     griefers = {}
@@ -143,9 +152,11 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
     :add_param('name_of_griefer',false)
     :register(
         function(player,name_of_griefer,raw)
-            name_of_griefer = tostring(name_of_griefer)
             if  not Table_for_varibaibels["started"] then
                 return Commands.error("The game is not started use /start (amountofgriefers time).") 
+            end
+            if checknumber(name_of_griefer) then 
+                return Commands.error("You can not use numbers only for this command. (If a players name is a number inform an admin.)") 
             end
             if not game.players[name_of_griefer] or not game.players[name_of_griefer].connected then
                 return Commands.error("Please use a in-game name for the parrameter.") 
