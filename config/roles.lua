@@ -257,7 +257,7 @@ Roles.override_player_roles{
     Cooldude2606={'Senior Administrator','Administrator','Moderator','Member'},
     arty714={'Senior Administrator','Administrator','Moderator','Member'},
     mark9064={'Administrator','Moderator','Member'},
-    Drahc_pro={'Administrator','Moderator','Member'},
+    Drahc_pro={'Senior Administrator','Moderator','Member'},
     aldldl={'Sponsor','Administrator','Moderator','Member'},
     LoicB={'Sponsor','Trainee','Member'},
     ookl={'Sponsor','Moderator','Member'},
