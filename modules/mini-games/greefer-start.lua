@@ -143,6 +143,7 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
     :add_param('name_of_greefer',false)
     :register(
         function(player,name_of_greefer,raw)
+            name_of_greefer = tostring(name_of_greefer)
             if  not Table_for_varibaibels["started"] then
                 return Commands.error("The game is not started use /start (amountofgreefers time).") 
             end
