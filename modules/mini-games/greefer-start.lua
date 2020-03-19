@@ -146,7 +146,7 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
             if  not Table_for_varibaibels["started"] then
                 return Commands.error("The game is not started use /start (amountofgreefers time).") 
             end
-            if not game.players[name_of_greefer] or  not game.players[name_of_greefer].connected then
+            if not game.players[name_of_greefer] or not game.players[name_of_greefer].connected then
                 return Commands.error("Please use a in-game name for the parrameter.") 
             end
             if  out[name_of_greefer] == true then 
@@ -181,7 +181,7 @@ Commands.new_command('vote','Use /vote to vote out players that you think are gr
                         game.print("Their are "..Table_for_varibaibels["cought"].." greefers left.")
                         Table_for_varibaibels["cought"] = Table_for_varibaibels["cought"]-1
                     else 
-                        game.print("Their are 0 greefers left VICTORY, Their where".. math.ceil(Table_for_varibaibels["Time"]/3600).." Minutes left.")
+                        game.print("There are 0 griefers left VICTORY, you still had ".. math.ceil(Table_for_varibaibels["Time"]/3600).." minutes left.")
                         reset_all()
                     end
                 else
@@ -289,5 +289,5 @@ end)
 Event.add(defines.events.on_player_joined_game,
 function(event)
     local  player = game.players[event.player_index]
-    player.print("Welcome to the minigame [color=red] griefer TTT [/color] to start the game us ''/start [time] [griefer amount]"..   ")
+    player.print("Welcome to the minigame [color=red] griefer TTT [/color] to start the game us ''/start [time] [griefer amount]. \n use /vote [suspect name] to vote out the player that you think is the griefer. \n /add is used to add a random griefer. \n With /time_left you can see how much time you still have to finish your goal. ")
 end)
