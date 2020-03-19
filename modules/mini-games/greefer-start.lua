@@ -290,5 +290,5 @@ end)
 Event.add(defines.events.on_player_joined_game,
 function(event)
     local  player = game.players[event.player_index]
-    player.print("Welcome to the minigame [color=red] griefer TTT [/color] to start the game us ''/start [time] [griefer amount]. \n use /vote [suspect name] to vote out the player that you think is the griefer. \n /add is used to add a random griefer. \n With /time_left you can see how much time you still have to finish your goal. ")
+    player.print("Welcome to the minigame [color=red] griefer TTT [/color] to start the game use ''/start [time] [griefer amount]. \n use /vote [suspect name] to vote out the player that you think is the griefer. \n /add is used to add a random griefer. \n With /time_left you can see how much time you still have to finish your goal. ")
 end)
