@@ -31,13 +31,24 @@ local function checknumber(num)
     end
 end
 
+local function reset_table(table)
+    for i, value in pairs(table) do
+        table[i] = nil
+    end
+end
+
 
 local function reset_all() -- Resets all tables and vars so /start can be used again.
     Table_for_varibaibels["started"] = false
-    griefers = {}
-    votes = {}
-    who_voted = {}
-    out = {}
+    reset_table(griefers)
+    reset_table(votes)
+    reset_table(who_voted)
+    reset_table(out)
+
+    --griefers = {}
+    --votes = {}
+    --who_voted = {}
+    --out = {}
     Table_for_varibaibels["cought"] = 0
     Table_for_varibaibels["Time"] = 0
     for i, player in pairs(game.connected_players) do
