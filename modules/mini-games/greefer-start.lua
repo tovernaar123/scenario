@@ -44,11 +44,7 @@ local function reset_all() -- Resets all tables and vars so /start can be used a
     reset_table(votes)
     reset_table(who_voted)
     reset_table(out)
-
-    --griefers = {}
-    --votes = {}
-    --who_voted = {}
-    --out = {}
+    
     Table_for_varibaibels["cought"] = 0
     Table_for_varibaibels["Time"] = 0
     for i, player in pairs(game.connected_players) do
