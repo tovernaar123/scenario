@@ -8,11 +8,10 @@ return {
     'modules.commands.roles',
     'modules.commands.debug',
     'modules.commands.interface',
-    -- Game Commands
     
-    -- QoL Addons
+    -- Mini-games
     'modules.mini-games.greefer-start',
-    -- GUI
+    'modules.mini-games.test',
 
     -- Config Files
     'config.expcore-commands.auth_admin', -- commands tagged with admin_only are blocked for non admins

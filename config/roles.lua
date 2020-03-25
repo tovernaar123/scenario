@@ -74,6 +74,8 @@ Roles.new_role('Moderator','Mod')
 :set_parent('Trainee')
 :allow{
     'command/win',
+    'command/test',
+    'command/stop',
     'command/clear_votes',
     'command/start',
     'command/add',
