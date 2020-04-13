@@ -75,27 +75,12 @@ Roles.new_role('Moderator','Mod')
 :allow{
     'command/win',
     'command/test',
+    'command/hi',
     'command/stop',
     'command/clear_votes',
     'command/start',
     'command/add',
-    'command/assign-role',
-    'command/unassign-role',
-    'command/repair',
-    'command/kill/always',
-    'command/clear-tag/always',
-    'command/go-to-spawn/always',
-    'command/clear-reports',
-    'command/clear-warnings',
-    'command/clear-temp-ban',
-    'command/clear-inventory',
-    'command/bonus',
-    'command/home',
-    'command/home-set',
-    'command/home-get',
-    'command/return',
-    'gui/rocket-info/toggle-active',
-    'gui/rocket-info/remote_launch',
+    
 }
 
 Roles.new_role('Trainee','TrMod')
@@ -106,7 +91,6 @@ Roles.new_role('Trainee','TrMod')
 :set_flag('report-immune')
 :set_parent('Donator')
 :allow{
-    'command/admin-chat',
     'command/teleport',
     'command/bring',
     'command/goto',
@@ -137,7 +121,6 @@ Roles.new_role('Pay to Win','P2W')
 :set_flag('instance-respawn')
 :set_parent('Donator')
 :allow{
-    'gui/rocket-info/toggle-active',
     'gui/rocket-info/remote_launch',
     'command/bonus',
     'command/home',
@@ -152,8 +135,6 @@ Roles.new_role('Donator','Don')
 :set_flag('is_spectator')
 :set_parent('Veteran')
 :allow{
-    'command/jail',
-    'command/unjail'
 }
 
 Roles.new_role('Partner','Part')
@@ -162,8 +143,6 @@ Roles.new_role('Partner','Part')
 :set_flag('is_spectator')
 :set_parent('Veteran')
 :allow{
-    'command/jail',
-    'command/unjail'
 }
 
 Roles.new_role('Veteran','Vet')
@@ -213,13 +192,6 @@ local default = Roles.new_role('Guest','')
     'command/all_votes',
     'command/time_left',
     'command/vote',
-    'command/tag',
-    'command/tag-clear',
-    'command/chelp',
-    'command/list-roles',
-    'command/find-on-map',
-    'command/report',
-    'command/ratio',
     'gui/player-list',
     'gui/rocket-info',
     'gui/science-info',

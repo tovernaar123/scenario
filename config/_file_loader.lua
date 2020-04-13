@@ -11,7 +11,7 @@ return {
     
     -- Mini-games
     'modules.mini-games.greefer-start',
-    'modules.mini-games.test',
+    'modules.mini-games.admin_overide',
 
     -- Config Files
     'config.expcore-commands.auth_admin', -- commands tagged with admin_only are blocked for non admins

@@ -1,6 +1,8 @@
 local Token = require 'utils.token' 
 local Event = require 'utils.event'
 local Commands = require 'expcore.commands'
+require 'config.expcore-commands.auth_runtime_disable' --required to load befor running the script
+
 
 local Mini_games = {
     mini_games={},
@@ -99,12 +101,13 @@ function Mini_games.start_game(name)
     end
 end
 
+
 function Mini_games.stop_game(name)
     local mini_game = Mini_games.mini_games[name]
     if mini_game == nil then
         error("This mini_game does not exsit")
     end
-    if started_game[1] == name  or started_game[1] == nil then
+    if started_game[1] ~= name  then
         error("This mini_game is not running")
     end
     
