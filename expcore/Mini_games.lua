@@ -1,6 +1,7 @@
 local Token = require 'utils.token' 
 local Event = require 'utils.event'
 local Commands = require 'expcore.commands'
+local Gui = require 'expcore.gui' --- @dep expcore.gui
 require 'config.expcore-commands.auth_runtime_disable' --required to load befor running the script
 
 
@@ -129,5 +130,20 @@ function Mini_games.stop_game(name)
     end
 end
 
+local example_button =
+Gui.element{
+    type = 'button',
+    caption = 'Example Button'
+}
+:on_click(function(player,element,event)
+    -- player is the player who interacted with the element to cause the event
+    -- element is a refrence to the element which caused the event
+    -- event is a raw refrence to the event data if player and element are not enough
+    game.print("lol")
+end)
+:add_to_left_flow(true)
+Gui.left_toolbar_button('entity/inserter', 'Nothing to see here', example_button)
+
+--left_toolbar_button
 
 return Mini_games
