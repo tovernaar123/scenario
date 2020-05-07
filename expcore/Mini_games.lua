@@ -38,6 +38,8 @@ function Mini_games.new_game(name)
         commands = {},
         start_function= nil,
         stop_function = nil,
+        map = nil,
+        positon = {},
     }, {
         __index= Mini_games._prototype
     })
@@ -57,6 +59,12 @@ end
 function Mini_games._prototype:add_command(command_name)
     self.commands[#commands + 1] = command_name
     Commands.disable(command_name)
+end
+function Mini_games._prototype:add_map(map,x,y)
+    --map is the name of surface to play the game on 
+    self.map = map
+    self.positon.x = x
+    self.positon.y = y
 end
 
 
@@ -79,20 +87,32 @@ function Mini_games.start_game(name)
     if started_game[1] == name then
         error("This game is already running")
     end
+    if mini_game.map == nil then
+        error("No map set")
+    end
+
     if started_game[1] then
         Mini_games.stop_game(started_game[1])
     end
 
+    local players = game.connected_players 
+    
+    for i, player in ipairs(game.connected_players) do
+        game.connected_players[i].teleport({mini_game.positon.x,mini_game.positon.y},mini_game.map)
+    end
 
     started_game[1] = name
-    for i,value  in ipairs(mini_game.events) do 
-        local handler = value[1]
-        local event_name = value[2]
-        Event.add_removable(event_name,handler)
+    if mini_game.events then
+        for i,value  in ipairs(mini_game.events) do 
+            local handler = value[1]
+            local event_name = value[2]
+            Event.add_removable(event_name,handler)
+        end
     end
-    
-    for i,command_name  in ipairs(mini_game.commands) do 
-        Commands.enable(command_name)
+    if mini_game.commands then
+        for i,command_name  in ipairs(mini_game.commands) do 
+            Commands.enable(command_name)
+        end
     end
 
     local start_func = mini_game.start_function
@@ -129,7 +149,7 @@ function Mini_games.stop_game(name)
         internal_error(success,err)
     end
 end
-
+--[[
 local example_button =
 Gui.element{
     type = 'button',
@@ -138,12 +158,12 @@ Gui.element{
 :on_click(function(player,element,event)
     -- player is the player who interacted with the element to cause the event
     -- element is a refrence to the element which caused the event
-    -- event is a raw refrence to the event data if player and element are not enough
+     --event is a raw refrence to the event data if player and element are not enough
     game.print("lol")
 end)
 :add_to_left_flow(true)
 Gui.left_toolbar_button('entity/inserter', 'Nothing to see here', example_button)
 
 --left_toolbar_button
-
+]]
 return Mini_games
