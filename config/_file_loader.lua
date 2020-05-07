@@ -9,9 +9,10 @@ return {
     'modules.commands.debug',
     'modules.commands.interface',
     
-    -- Mini-games
+    --Mini-games
     'modules.mini-games.greefer-start',
     'modules.mini-games.admin_overide',
+    'modules.mini-games.Race',
 
     -- Config Files
     'config.expcore-commands.auth_admin', -- commands tagged with admin_only are blocked for non admins

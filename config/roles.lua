@@ -80,6 +80,8 @@ Roles.new_role('Moderator','Mod')
     'command/clear_votes',
     'command/start',
     'command/add',
+    'command/dump',
+    'command/set'
     
 }
 

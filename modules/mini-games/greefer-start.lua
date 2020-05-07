@@ -1,14 +1,15 @@
+--[[
 local Commands = require 'expcore.commands'
 
 local Event = require 'utils.event' --- @dep utils.event
 local Permission_Groups = require 'expcore.permission_groups'
 require 'config.expcore-commands.parse_general'
---[[
-    This is the code for the griefer game.
-    In short their are a number of griefer that need to stop the good-guys for finishing the goal.
-    But the griefer shood be suttle as they can be voted out bye anyone with /vote.
-    To start the game smiply do /start number_of_griefers time_to_reach_goal.
---]]
+
+    --This is the code for the griefer game.
+    --In short their are a number of griefer that need to stop the good-guys for finishing the goal.
+    --But the griefer shood be suttle as they can be voted out bye anyone with /vote.
+    --To start the game smiply do /start number_of_griefers time_to_reach_goal.
+
 
 
 
@@ -132,7 +133,6 @@ Commands.new_command('start','Command to start griefer game.') --Used to start t
             tell_players()
 
         end)
-
 Commands.new_command('add','Command to add a griefer.') --Adds a griefer (admin only).
         :add_param('amount_of_griefers',false,'number')
         :register(function(player,amount_of_griefers,raw)
@@ -311,3 +311,5 @@ function(event)
     local  player = game.players[event.player_index]
     player.print("Welcome to the minigame [color=red] griefer TTT [/color] to start the game use ''/start [griefer amount] [time]. \n use /vote [suspect name] to vote out the player that you think is the griefer. \n /add is used to add a random griefer. \n With /time_left you can see how much time you still have to finish your goal. ")
 end)
+
+]]
