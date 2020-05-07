@@ -1,9 +1,14 @@
 local Mini_games = require 'expcore.Mini_games'
+local surface
+local start  = function ()
+    surface = game.surfaces["Race game"]
+    local car =  surface.create_entity{name="car", position={-80, -140},force=game.connected_players[1].force}
+    car.set_driver(game.connected_players[1])
 
 
-local game = Mini_games.new_game("Race_game")
-game:add_map("Race game",-80,-140)
-game:add_event(defines.events.on_player_joined_game,function(arg1)
-    local  player = game.players[event.player_index]
-    player.print("hi")
-end)
+end
+
+
+local race = Mini_games.new_game("Race_game")
+race:add_map("Race game",-80,-140)
+race:add_start_function(start)
