@@ -5,22 +5,21 @@ local Gui = require 'expcore.gui' --- @dep expcore.gui
 require 'config.expcore-commands.auth_runtime_disable' --required to load befor running the script
 
 
-local Mini_games = {
-    mini_games={},
-    _prototype={},
-}
+local Mini_games = {}
 
 local started_game = {}
 
 local Global = require 'utils.global' --Used to prevent desynicing.
 Global.register({
-    started_game = started_game 
+    started_game = started_game,
+    Mini_games = Mini_games
 },function(tbl)
     started_game = tbl.started_game
+    Mini_games = tbl.Mini_games
 end)
 
-
-
+Mini_games["mini_games"] = {}
+Mini_games["_prototype"] = {}
 
 
 local function internal_error(success,error_message)
@@ -40,11 +39,17 @@ function Mini_games.new_game(name)
         stop_function = nil,
         map = nil,
         positon = {},
+        vars = {},
     }, {
         __index= Mini_games._prototype
     })
     Mini_games.mini_games[name] = mini_game
     return mini_game
+end
+
+
+function Mini_games._prototype:add_var(var)
+    self.vars[#self.vars + 1] = var   
 end
 
 function Mini_games._prototype:add_start_function(start_function)
@@ -57,7 +62,7 @@ function Mini_games._prototype:add_stop_function(start_function)
 end
 
 function Mini_games._prototype:add_command(command_name)
-    self.commands[#commands + 1] = command_name
+    self.commands[#self.commands + 1] = command_name
     Commands.disable(command_name)
 end
 function Mini_games._prototype:add_map(map,x,y)
