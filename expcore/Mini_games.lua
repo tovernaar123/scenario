@@ -49,16 +49,16 @@ end
 
 
 function Mini_games._prototype:add_var(var)
-    self.vars[#self.vars + 1] = var   
+    self.vars[#self.vars + 1] = var  
 end
 
 function Mini_games._prototype:add_start_function(start_function)
 
-    self.start_function = start_function   
+    self.start_function = start_function
 end
 
 function Mini_games._prototype:add_stop_function(start_function)
-    self.start_function = start_function    
+    self.start_function = start_function   
 end
 
 function Mini_games._prototype:add_command(command_name)
@@ -66,19 +66,18 @@ function Mini_games._prototype:add_command(command_name)
     Commands.disable(command_name)
 end
 function Mini_games._prototype:add_map(map,x,y)
-    --map is the name of surface to play the game on 
+    --map is the name of surface to play the game on
     self.map = map
     self.positon.x = x
     self.positon.y = y
 end
 
 
-function Mini_games._prototype:add_event(event_name,func) 
+function Mini_games._prototype:add_event(event_name,func)
     local handler = Token.register(
         func
     )
     self.events[#self.events+1] = {handler,event_name}
-     
 end
 
 
@@ -100,22 +99,22 @@ function Mini_games.start_game(name)
         Mini_games.stop_game(started_game[1])
     end
 
-    local players = game.connected_players 
-    
+    local players = game.connected_players
+
     for i, player in ipairs(game.connected_players) do
         game.connected_players[i].teleport({mini_game.positon.x,mini_game.positon.y},mini_game.map)
     end
 
     started_game[1] = name
     if mini_game.events then
-        for i,value  in ipairs(mini_game.events) do 
+        for i,value  in ipairs(mini_game.events) do
             local handler = value[1]
             local event_name = value[2]
             Event.add_removable(event_name,handler)
         end
     end
     if mini_game.commands then
-        for i,command_name  in ipairs(mini_game.commands) do 
+        for i,command_name  in ipairs(mini_game.commands) do
             Commands.enable(command_name)
         end
     end
@@ -136,15 +135,15 @@ function Mini_games.stop_game(name)
     if started_game[1] ~= name  then
         error("This mini_game is not running")
     end
-    
+
     started_game[1] = nil
-    for i,value  in ipairs(mini_game.events) do 
+    for i,value  in ipairs(mini_game.events) do
         local handler = value[1]
         local event_name = value[2]
         Event.remove_removable(event_name, handler)
     end
 
-    for i,command_name  in ipairs(mini_game.commands) do 
+    for i,command_name  in ipairs(mini_game.commands) do
         Commands.disable(command_name)
     end
 

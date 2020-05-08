@@ -24,16 +24,61 @@ local start  = function ()
         car.set_driver(game.connected_players[i])
     end
     
-    areas[1] = surface[1].get_script_areas("gate_1")[1].area
-    areas[2] = surface[1].get_script_areas("gate_2")[1].area
-    areas[3] = surface[1].get_script_areas("gate_3")[1].area
-    areas[4] = surface[1].get_script_areas("gate_4")[1].area
+    areas[1] = surface[1].get_script_areas("gate_1_box")[1].area
+    areas[2] = surface[1].get_script_areas("gate_2_box")[1].area
+    areas[3] = surface[1].get_script_areas("gate_3_box")[1].area
+    areas[4] = surface[1].get_script_areas("gate_4_box")[1].area
+    local gate_boxes = {}
+    gate_boxes[1] = surface[1].get_script_areas("gate_1")[1].area
+    gate_boxes[2] = surface[1].get_script_areas("gate_2")[1].area
+    gate_boxes[3] = surface[1].get_script_areas("gate_3")[1].area
+    gate_boxes[4] = surface[1].get_script_areas("gate_4")[1].area
 
-
+    --gate
+    gates[1] = surface[1].find_entities_filtered{area = gate_boxes[1], name = "gate"} 
+    gates[2] = surface[1].find_entities_filtered{area = gate_boxes[2], name = "gate"} 
+    gates[3] = surface[1].find_entities_filtered{area = gate_boxes[3], name = "gate"} 
+    gates[4] = surface[1].find_entities_filtered{area = gate_boxes[4], name = "gate"} 
 end
 
+local function insideBox(box , pos)
+    local x1 = box.left_top.x
+    local y1 = box.left_top.y
+    local x2 = box.right_bottom.x
+    local y2 = box.right_bottom.y
+
+    local px = pos.x
+    local py = pos.y
+    return px >= x1 and px <= x2 and py >= y1 and py <= y2; 
+end 
+
+local player_progress = {}
+
 local turn = function (event)
-        
+    local player = game.players[event.player_index]
+    local pos = player.position 
+    local name = player.name
+    for i, box in ipairs(areas) do
+        if insideBox(box,pos) then
+            if not player_progress[name] then
+                player_progress[name] = 1
+            else 
+                if player_progress[name] >= i then 
+                    for i, gate in ipairs(gates[i]) do 
+                        game.print("open")
+                        gate.request_to_open(gate.force,100)
+                        
+                    end
+                    if player_progress[name] == i then
+                        player_progress[name] = player_progress[name] + 1
+                    end
+                    if player_progress[name] == 5 then
+                        player_progress[name] = 1
+                    end
+                end
+            end   
+        end
+    end
 end
 
 
@@ -43,4 +88,5 @@ race:add_start_function(start)
 race:add_var(surface)
 race:add_var(gates)
 race:add_var(areas)
---race:add_event(defines.on_player_changed_position,turn)
+race:add_var(player_progress)
+race:add_event(defines.events.on_player_changed_position,turn)
