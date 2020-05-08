@@ -4,26 +4,8 @@ local gates = {}
 local areas = {}
 
 
-local start  = function ()
-    surface[1] = game.surfaces["Race game"]
-    local done_left = 0
-    local done_right = 0
-    local left = true
-    for i, player in ipairs(game.connected_players) do
-        local pos
-        if (left) then
-            pos = {-85, -132-done_left*5}
-            done_left = done_left +1
-            left = false
-        else
-            pos = {-75,-132-done_right*5}
-            done_right = done_right +1
-            left = true
-        end
-        local car =  surface[1].create_entity{name="car", direction= defines.direction.south, position=pos,force="player"}
-        car.set_driver(game.connected_players[i])
-    end
-    
+
+local  function setup_gates()
     areas[1] = surface[1].get_script_areas("gate_1_box")[1].area
     areas[2] = surface[1].get_script_areas("gate_2_box")[1].area
     areas[3] = surface[1].get_script_areas("gate_3_box")[1].area
@@ -41,6 +23,32 @@ local start  = function ()
     gates[4] = surface[1].find_entities_filtered{area = gate_boxes[4], name = "gate"} 
 end
 
+local start  = function ()
+    surface[1] = game.surfaces["Race game"]
+    local done_left = 0
+    local done_right = 0
+    local left = true
+    for i, player in ipairs(game.connected_players) do
+        local pos
+        if (left) then
+            pos = {-85, -132-done_left*5}
+            done_left = done_left +1
+            left = false
+        else
+            pos = {-75,-132-done_right*5}
+            done_right = done_right +1
+            left = true
+        end
+        local car =  surface[1].create_entity{name="car", direction= defines.direction.north, position=pos,force="player"}
+        car.set_driver(game.connected_players[i])
+    end
+    
+    setup_gates()
+end
+
+
+
+
 local function insideBox(box , pos)
     local x1 = box.left_top.x
     local y1 = box.left_top.y
@@ -54,32 +62,37 @@ end
 
 local player_progress = {}
 
-local turn = function (event)
+local player_move = function (event)
     local player = game.players[event.player_index]
     local pos = player.position 
     local name = player.name
     for i, box in ipairs(areas) do
         if insideBox(box,pos) then
-            if not player_progress[name] then
+            local progress = player_progress[name]
+            if not progress then
                 player_progress[name] = 1
-            else 
-                if player_progress[name] >= i then 
-                    for i, gate in ipairs(gates[i]) do 
-                        gate.request_to_open(gate.force,100)
+                progress = 1
+            end 
+            if progress >= i then 
+                for i, gate in ipairs(gates[i]) do 
+                    gate.request_to_open(gate.force,100)
                         
-                    end
-                    if player_progress[name] == i then
-                        player_progress[name] = player_progress[name] + 1
-                    end
-                    if player_progress[name] == 5 then
-                        player_progress[name] = 1
-                    end
                 end
+                if progress == i and progress ~= 5 then
+                    player_progress[name] = player_progress[name] + 1
+                else 
+                if progress == 5 then
+                    player_progress[name] = 1
+                end
+            end
             end   
         end
     end
 end
 
+local car_destroyed = function (event)
+
+end
 
 local race = Mini_games.new_game("Race_game")
 race:add_map("Race game",-80,-140)
@@ -88,4 +101,5 @@ race:add_var(surface)
 race:add_var(gates)
 race:add_var(areas)
 race:add_var(player_progress)
-race:add_event(defines.events.on_player_changed_position,turn)
+race:add_event(defines.events.on_player_changed_position,player_move)
+race:add_event(defines.events.on_entity_died,car_destroyed)
