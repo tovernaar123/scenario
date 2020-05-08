@@ -2,7 +2,9 @@ local Mini_games = require 'expcore.Mini_games'
 local surface = {}
 local gates = {}
 local areas = {}
-
+local player_progress = {}
+local cars = {}
+local race = Mini_games.new_game("Race_game")
 
 
 local  function setup_gates()
@@ -23,11 +25,12 @@ local  function setup_gates()
     gates[4] = surface[1].find_entities_filtered{area = gate_boxes[4], name = "gate"} 
 end
 
-local start  = function ()
+local start  = function (args)
     surface[1] = game.surfaces["Race game"]
     local done_left = 0
     local done_right = 0
     local left = true
+    local fuel = args[1]
     for i, player in ipairs(game.connected_players) do
         local pos
         if (left) then
@@ -41,12 +44,24 @@ local start  = function ()
         end
         local car =  surface[1].create_entity{name="car", direction= defines.direction.north, position=pos,force="player"}
         car.set_driver(game.connected_players[i])
+        car.get_fuel_inventory().insert({name=fuel, count=100})
+        cars[#cars+1] = car
     end
     
     setup_gates()
+
+    race:add_var(surface)
+    race:add_var(gates)
+    race:add_var(areas)
+    race:add_var(player_progress)
+    race:add_var(cars)
 end
 
-
+local stop  = function ()
+    for i, car in ipairs(cars) do
+        car.destroy()
+    end
+end
 
 
 local function insideBox(box , pos)
@@ -60,7 +75,6 @@ local function insideBox(box , pos)
     return px >= x1 and px <= x2 and py >= y1 and py <= y2; 
 end 
 
-local player_progress = {}
 
 local player_move = function (event)
     local player = game.players[event.player_index]
@@ -90,16 +104,10 @@ local player_move = function (event)
     end
 end
 
-local car_destroyed = function (event)
 
-end
-
-local race = Mini_games.new_game("Race_game")
 race:add_map("Race game",-80,-140)
 race:add_start_function(start)
-race:add_var(surface)
-race:add_var(gates)
-race:add_var(areas)
-race:add_var(player_progress)
+race:add_stop_function(stop)
 race:add_event(defines.events.on_player_changed_position,player_move)
-race:add_event(defines.events.on_entity_died,car_destroyed)
+--race:add_event(defines.events.on_entity_died,car_destroyed)
+race:add_option(1)

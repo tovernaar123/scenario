@@ -23,7 +23,7 @@ Mini_games["_prototype"] = {}
 
 
 local function internal_error(success,error_message)
-    if not success then
+    if not success and error_message then
         game.print("Their is an error please contact the admins, error: "..error_message)
         log(error_message)
     end
@@ -34,12 +34,14 @@ function Mini_games.new_game(name)
     local mini_game = setmetatable({
         name=name,
         events = {},
+        onth_tick = {},
         commands = {},
         start_function= nil,
         stop_function = nil,
         map = nil,
         positon = {},
         vars = {},
+        options = 0,
     }, {
         __index= Mini_games._prototype
     })
@@ -48,7 +50,14 @@ function Mini_games.new_game(name)
 end
 
 
-function Mini_games._prototype:add_var(var)
+function Mini_games._prototype:add_onth_tick(tick,func)
+    local handler = Token.register(
+        func
+    )
+    self.onth_tick[#self.onth_tick+1] = {tick,handler}
+end
+
+function Mini_games._prototype:add_var(var,optional)
     self.vars[#self.vars + 1] = var  
 end
 
@@ -56,9 +65,14 @@ function Mini_games._prototype:add_start_function(start_function)
 
     self.start_function = start_function
 end
+function Mini_games._prototype:add_option(amount)
 
-function Mini_games._prototype:add_stop_function(start_function)
-    self.start_function = start_function   
+    self.options = self.options+amount
+end
+
+
+function Mini_games._prototype:add_stop_function(stop_function)
+    self.stop_function = stop_function   
 end
 
 function Mini_games._prototype:add_command(command_name)
@@ -81,15 +95,20 @@ function Mini_games._prototype:add_event(event_name,func)
 end
 
 
-function Mini_games.start_game(name)
-    local mini_game = Mini_games.mini_games[name]
+function Mini_games.start_game(name,...)
 
+    local parse_args = {...}
+    local mini_game = Mini_games.mini_games[name]
     if mini_game == nil then
-        error("This mini_game does not exsit")
+        return "This mini_game does not exsit"
+    end
+
+    if  mini_game.options ~= #parse_args then
+        return "Wrong number of arguments"
     end
 
     if started_game[1] == name then
-        error("This game is already running")
+        return "This game is already running"
     end
     if mini_game.map == nil then
         error("No map set")
@@ -99,20 +118,26 @@ function Mini_games.start_game(name)
         Mini_games.stop_game(started_game[1])
     end
 
-    local players = game.connected_players
+
 
     for i, player in ipairs(game.connected_players) do
         game.connected_players[i].teleport({mini_game.positon.x,mini_game.positon.y},mini_game.map)
     end
 
     started_game[1] = name
-    if mini_game.events then
-        for i,value  in ipairs(mini_game.events) do
-            local handler = value[1]
-            local event_name = value[2]
-            Event.add_removable(event_name,handler)
-        end
+    
+    for i,value  in ipairs(mini_game.events) do
+        local handler = value[1]
+        local event_name = value[2]
+        Event.add_removable(event_name,handler)
     end
+
+    for i,value  in ipairs(mini_game.onth_tick) do
+        local tick = value[1]
+        local token = value[2]
+        Event.add_removable_nth_tick(tick, token)
+    end
+
     if mini_game.commands then
         for i,command_name  in ipairs(mini_game.commands) do
             Commands.enable(command_name)
@@ -121,19 +146,21 @@ function Mini_games.start_game(name)
 
     local start_func = mini_game.start_function
     if start_func then 
-        local success, err = pcall(start_func)
-        internal_error(success,err)
+        if parse_args then
+            local success, err = pcall(start_func,parse_args)
+            internal_error(success,err)
+        else
+            local success, err = pcall(start_func)
+            internal_error(success,err)
+        end
     end
 end
 
 
-function Mini_games.stop_game(name)
-    local mini_game = Mini_games.mini_games[name]
+function Mini_games.stop_game()
+    local mini_game = Mini_games.mini_games[started_game[1]]
     if mini_game == nil then
         error("This mini_game does not exsit")
-    end
-    if started_game[1] ~= name  then
-        error("This mini_game is not running")
     end
 
     started_game[1] = nil
@@ -143,11 +170,23 @@ function Mini_games.stop_game(name)
         Event.remove_removable(event_name, handler)
     end
 
+    for i,value  in ipairs(mini_game.onth_tick) do
+        local tick = value[1]
+        local token = value[2]
+        Event.remove_removable_nth_tick(tick, token)
+    end
+
+    for i, player in ipairs(game.connected_players) do
+        game.connected_players[i].teleport({-35,55},"nauvis")
+    end
+    for i, var in ipairs(mini_game.vars) do 
+        mini_game.vars[i] = {} 
+    end
     for i,command_name  in ipairs(mini_game.commands) do
         Commands.disable(command_name)
     end
 
-    local stop_func = Mini_games.mini_games[name].stop_function
+    local stop_func = mini_game.stop_function
     if stop_func then
         local success, err =  pcall(stop_func)
         internal_error(success,err)
