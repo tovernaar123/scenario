@@ -65,7 +65,6 @@ local turn = function (event)
             else 
                 if player_progress[name] >= i then 
                     for i, gate in ipairs(gates[i]) do 
-                        game.print("open")
                         gate.request_to_open(gate.force,100)
                         
                     end
