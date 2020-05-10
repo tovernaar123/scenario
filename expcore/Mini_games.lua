@@ -41,6 +41,7 @@ function Mini_games.new_game(name)
         map = nil,
         positon = {},
         vars = {},
+        vars_2 = {},
         options = 0,
     }, {
         __index= Mini_games._prototype
@@ -57,8 +58,12 @@ function Mini_games._prototype:add_onth_tick(tick,func)
     self.onth_tick[#self.onth_tick+1] = {tick,handler}
 end
 
-function Mini_games._prototype:add_var(var,optional)
-    self.vars[#self.vars + 1] = var  
+function Mini_games._prototype:add_var(var)
+    self.vars[#self.vars + 1] = var
+end
+
+function Mini_games._prototype:add_var_global(var)
+    self.vars_2[#self.vars_2 + 1] = var
 end
 
 function Mini_games._prototype:add_start_function(start_function)
@@ -179,9 +184,7 @@ function Mini_games.stop_game()
     for i, player in ipairs(game.connected_players) do
         game.connected_players[i].teleport({-35,55},"nauvis")
     end
-    for i, var in ipairs(mini_game.vars) do 
-        mini_game.vars[i] = {} 
-    end
+    mini_game.vars = {} 
     for i,command_name  in ipairs(mini_game.commands) do
         Commands.disable(command_name)
     end
