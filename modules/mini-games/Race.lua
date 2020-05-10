@@ -1,6 +1,7 @@
 local Mini_games = require 'expcore.Mini_games'
 local Event = require 'utils.event'
-local Token = require 'utils.token' 
+local Token = require 'utils.token'
+local task =  require 'utils.task'
 local surface = {}
 local gates = {}
 local areas = {}
@@ -11,21 +12,7 @@ local variables = {}
 local race = Mini_games.new_game("Race_game")
 local token_for_car
 
-local respawn_car = function()
-    local player = variables[1]
-    local car =  surface[1].create_entity{name="car", direction= defines.direction.north , position=variables[2],force="player"}
-    car.set_driver(player)
-    car.orientation = variables[3]
-    car.get_fuel_inventory().insert({name=fuel[1], count=100})   
-    Event.remove_removable_nth_tick(180, token_for_car)
-    cars[variables[1].name] = car
-end
 
-
-token_for_car = Token.register(
-    respawn_car
-)
-race:add_var_global(token_for_car)
 
 local  function setup_gates()
     areas[1] = surface[1].get_script_areas("gate_1_box")[1].area
@@ -72,7 +59,7 @@ local start  = function (args)
 
     race:add_var(surface)
     race:add_var(gates)
-    
+    race:add_var(variables)
     race:add_var(areas)
     race:add_var(player_progress)
     race:add_var(cars)
@@ -126,7 +113,20 @@ local player_move = function (event)
     end
 end
 
+local respawn_car = function()
+    local player = variables[1]
+    local car =  surface[1].create_entity{name="car", direction= defines.direction.north , position=variables[2],force="player"}
+    car.set_driver(player)
+    car.orientation = variables[3]
+    car.get_fuel_inventory().insert({name=fuel[1], count=100})   
+    cars[variables[1].name] = car
+end
 
+
+token_for_car = Token.register(
+    respawn_car
+)
+race:add_var_global(token_for_car)
 
 
 local car_destroyed = function (event)
@@ -135,7 +135,8 @@ local car_destroyed = function (event)
         variables[1] = dead_car.get_driver().player
         variables[2] = dead_car.position
         variables[3] = dead_car.orientation
-        Event.add_removable_nth_tick(180, token_for_car)
+        task.set_timeout_in_ticks(180,token_for_car)
+        --Event.add_removable_nth_tick(180, token_for_car)
     end
 end
 
