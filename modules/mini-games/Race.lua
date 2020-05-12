@@ -3,6 +3,7 @@ local Mini_games = require "expcore.Mini_games"
 local Token = require "utils.token"
 local task = require "utils.task"
 local Permission_Groups = require "expcore.permission_groups"
+local Global = require 'utils.global' --Used to prevent desynicing.
 local surface = {}
 local gates = {}
 local areas = {}
@@ -35,17 +36,30 @@ local function setup_areas()
     gates[4] = surface[1].find_entities_filtered {area = gate_boxes[4], name = "gate"}
 end
 
-local start = function(args)
-    race:add_var(surface,"surface")
-    race:add_var(gates,"gates")
-    race:add_var(variables,"variables")
-    race:add_var(areas,"areas")
-    race:add_var(player_progress,"player_progress")
-    race:add_var(cars,"cars")
-    race:add_var(fuel,"fuel")
-    race:add_var(scores,"scores")
-    race:add_var(laps,"laps")
 
+Global.register({
+    surface = surface,
+    gates = gates,
+    variables = variables,
+    areas = areas,
+    player_progress = player_progress,
+    cars = cars,
+    scores = scores,
+    laps = laps,
+    fuel = fuel
+},function(tbl)
+    surface = tbl.surface
+    gates = tbl.gates
+    variables = tbl.variables
+    areas = tbl.areas
+    player_progress = tbl.player_progress
+    cars = tbl.cars
+    scores = tbl.scores
+    laps = tbl.laps
+    
+end)
+
+local start = function(args)
     surface[1] = game.surfaces["Race game"]
     variables["done_left"] = 0
     variables["done_right"] = 0
@@ -207,10 +221,9 @@ local function invisabilty(car)
 end
 
 local token_for_stop_invins = Token.register(stop_invins)
-race:add_var_global(token_for_stop_invins)
 
 local token_for_kill_biters = Token.register(kill_biters)
-race:add_var_global(token_for_kill_biters)
+
 
 local respawn_car = function()
     local player = variables[1]
@@ -233,7 +246,7 @@ local respawn_car = function()
 end
 
 token_for_car = Token.register(respawn_car)
-race:add_var_global(token_for_car)
+
 
 local car_destroyed = function(event)
     local dead_car = event.entity
