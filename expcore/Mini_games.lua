@@ -93,9 +93,7 @@ end
 
 
 function Mini_games._prototype:add_event(event_name,func)
-    local handler = Token.register(
-        func
-    )
+    local handler = Token.register(func)
     self.events[#self.events+1] = {handler,event_name}
 end
 

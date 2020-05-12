@@ -96,10 +96,10 @@ Permission_Groups.new_group('Guest')
     'activate_cut'
 }
 
-Permission_Groups.new_group('Voted_out')
+--Race_game
+Permission_Groups.new_group('out_car')
 :disallow_all()
 :allow{
-    'start_walking',
     'write_to_console'
 }
 
