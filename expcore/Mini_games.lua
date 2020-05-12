@@ -12,10 +12,8 @@ local started_game = {}
 local Global = require 'utils.global' --Used to prevent desynicing.
 Global.register({
     started_game = started_game,
-    Mini_games = Mini_games
 },function(tbl)
     started_game = tbl.started_game
-    Mini_games = tbl.Mini_games
 end)
 
 Mini_games["mini_games"] = {}
