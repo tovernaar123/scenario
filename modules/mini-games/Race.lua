@@ -15,13 +15,14 @@ local race = Mini_games.new_game("Race_game")
 local token_for_car
 local scores = {}
 local laps = {}
+local gate_boxes = {}
 
 local function setup_areas()
     areas[1] = surface[1].get_script_areas("gate_1_box")[1].area
     areas[2] = surface[1].get_script_areas("gate_2_box")[1].area
     areas[3] = surface[1].get_script_areas("gate_3_box")[1].area
     areas[4] = surface[1].get_script_areas("gate_4_box")[1].area
-    local gate_boxes = {}
+
     gate_boxes[1] = surface[1].get_script_areas("gate_1")[1].area
     gate_boxes[2] = surface[1].get_script_areas("gate_2")[1].area
     gate_boxes[3] = surface[1].get_script_areas("gate_3")[1].area
@@ -46,7 +47,8 @@ Global.register({
     cars = cars,
     scores = scores,
     laps = laps,
-    fuel = fuel
+    fuel = fuel,
+    gate_boxes = gate_boxes
 },function(tbl)
     surface = tbl.surface
     gates = tbl.gates
@@ -56,6 +58,7 @@ Global.register({
     cars = tbl.cars
     scores = tbl.scores
     laps = tbl.laps
+    gate_boxes = tbl.gate_boxes
     
 end)
 
