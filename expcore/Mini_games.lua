@@ -162,9 +162,7 @@ end
 
 function Mini_games.stop_game()
     local mini_game = Mini_games.mini_games[started_game[1]]
-    if mini_game == nil then
-        error("This mini_game does not exsit")
-    end
+
 
     started_game[1] = nil
     for i,value  in ipairs(mini_game.events) do
@@ -182,16 +180,25 @@ function Mini_games.stop_game()
     for i, player in ipairs(game.connected_players) do
         game.connected_players[i].teleport({-35,55},"nauvis")
     end
-    mini_game.vars = {} 
-    for i,command_name  in ipairs(mini_game.commands) do
-        Commands.disable(command_name)
-    end
 
     local stop_func = mini_game.stop_function
     if stop_func then
         local success, err =  pcall(stop_func)
         internal_error(success,err)
     end
+
+    mini_game.vars = {} 
+    for i,command_name  in ipairs(mini_game.commands) do
+        Commands.disable(command_name)
+    end
+
+end
+
+
+function Mini_games.error_in_game(error_game)
+    --error(error_game)   
+    Mini_games.stop_game()
+    game.print("an error has occured things may be broken, error: "..error_game)
 end
 --[[
 local example_button =

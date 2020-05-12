@@ -1,5 +1,5 @@
 local Mini_games = require "expcore.Mini_games"
-local Event = require "utils.event"
+--local Event = require "utils.event"
 local Token = require "utils.token"
 local task = require "utils.task"
 local Permission_Groups = require "expcore.permission_groups"
@@ -12,8 +12,9 @@ local fuel = {}
 local variables = {}
 local race = Mini_games.new_game("Race_game")
 local token_for_car
+local scores = {}
 
-local function setup_gates()
+local function setup_areas()
     areas[1] = surface[1].get_script_areas("gate_1_box")[1].area
     areas[2] = surface[1].get_script_areas("gate_2_box")[1].area
     areas[3] = surface[1].get_script_areas("gate_3_box")[1].area
@@ -25,6 +26,8 @@ local function setup_gates()
     gate_boxes[3] = surface[1].get_script_areas("gate_3")[1].area
     gate_boxes[4] = surface[1].get_script_areas("gate_4")[1].area
 
+    variables["finsih"] = surface[1].get_script_areas("finsish_line")[1].area
+
     --gate
     gates[1] = surface[1].find_entities_filtered {area = gate_boxes[1], name = "gate"}
     gates[2] = surface[1].find_entities_filtered {area = gate_boxes[2], name = "gate"}
@@ -33,21 +36,35 @@ local function setup_gates()
 end
 
 local start = function(args)
+    race:add_var(surface)
+    race:add_var(gates)
+    race:add_var(variables)
+    race:add_var(areas)
+    race:add_var(player_progress)
+    race:add_var(cars)
+    race:add_var(fuel)
+    race:add_var(scores)
+
     surface[1] = game.surfaces["Race game"]
-    local done_left = 0
-    local done_right = 0
-    local left = true
+    variables["done_left"] = 0
+    variables["done_right"] = 0
+    variables["left"] = true
+    variables["error_game"] = false
     fuel[1] = args[1]
+    if not game.item_prototypes[fuel[1]] then
+        variables["error_game"] = true
+    end
+
     for i, player in ipairs(game.connected_players) do
         local pos
-        if (left) then
-            pos = {-85, -126 + done_left * 5}
-            done_left = done_left + 1
-            left = false
+        if (variables["left"]) then
+            pos = {-85, -126 + variables["done_left"] * 5}
+            variables["done_left"] = variables["done_left"] + 1
+            variables["left"] = false
         else
-            pos = {-75, -126 + done_right * 5}
-            done_right = done_right + 1
-            left = true
+            pos = {-75, -126 + variables["done_right"] * 5}
+            variables["done_right"] = variables["done_right"] + 1
+            variables["left"] = true
         end
         local car =
             surface[1].create_entity {
@@ -56,23 +73,22 @@ local start = function(args)
             position = pos,
             force = "player"
         }
-        car.set_driver(game.connected_players[i])
-        car.get_fuel_inventory().insert({name = fuel[1], count = 100})
-        cars[car.get_driver().player.name] = car
+        if not variables["error_game"] then
+            car.set_driver(game.connected_players[i])
+            car.get_fuel_inventory().insert({name = fuel[1], count = 100})
+        end
+        cars[player.name] = car
     end
 
-    setup_gates()
+    setup_areas()
 
-    race:add_var(surface)
-    race:add_var(gates)
-    race:add_var(variables)
-    race:add_var(areas)
-    race:add_var(player_progress)
-    race:add_var(cars)
-    race:add_var(fuel)
+    if variables["error_game"] then
+        Mini_games.error_in_game("wrong fuel type")
+    end
 end
 
 local stop = function()
+    game.print("stop")
     for i, car in pairs(cars) do
         car.destroy()
     end
@@ -93,15 +109,13 @@ local player_move = function(event)
     local player = game.players[event.player_index]
     local pos = player.position
     local name = player.name
+    local found_match = false
     for i, box in ipairs(areas) do
         if insideBox(box, pos) then
             local progress = player_progress[name]
-            if not progress then
-                player_progress[name] = 1
-                progress = 1
-            end
             if i ~= 5 then
-                if progress == i or progress-1 == i then
+                if progress == i or progress - 1 == i then
+                    found_match = true
                     for i, gate in ipairs(gates[i]) do
                         gate.request_to_open(gate.force, 100)
                     end
@@ -109,19 +123,34 @@ local player_move = function(event)
                         player_progress[name] = player_progress[name] + 1
                     end
                 end
+            end
+        end
+    end
+    if not found_match then
+        if insideBox(variables["finsih"], pos) then
+            game.print("hi")
+            if player_progress[name] then 
+                game.print("not nil")
+                if player_progress[name] == 5 then
+                    game.print("5")
+                    player_progress[name] = 1
+                    --scores[name] = game.tick
+                    player.print(tostring(math.round((game.tick-scores[name])/3600,4)))
+                end
             else
+                game.print("nil")
+                scores[name] = game.tick
                 player_progress[name] = 1
             end
         end
     end
 end
 
-local token_for_walking
 local stop_invins = function()
     variables[5].force = "player"
 end
 
-local kill_biters = function ()
+local kill_biters = function()
     local biters = surface[1].find_enemy_units(variables[2], 3, "player")
     for i, biter in ipairs(biters) do
         biter.destroy()
@@ -132,7 +161,7 @@ local function invisabilty(car)
     car.force = "enemy"
     local biters = surface[1].find_enemy_units(variables[2], 50, "player")
     for i, biter in ipairs(biters) do
-        biter.set_command({type= defines.command.flee, from = car })
+        biter.set_command({type = defines.command.flee, from = car})
     end
 end
 
@@ -142,12 +171,15 @@ race:add_var_global(token_for_stop_invins)
 local token_for_kill_biters = Token.register(kill_biters)
 race:add_var_global(token_for_kill_biters)
 
-
-
-
 local respawn_car = function()
     local player = variables[1]
-    local car = surface[1].create_entity {name = "car",direction = defines.direction.north,position = variables[2],force = "player"}
+    local car =
+        surface[1].create_entity {
+        name = "car",
+        direction = defines.direction.north,
+        position = variables[2],
+        force = "player"
+    }
     car.set_driver(player)
     car.orientation = variables[3]
     car.get_fuel_inventory().insert({name = fuel[1], count = 100})
@@ -177,7 +209,7 @@ local car_destroyed = function(event)
     end
 end
 
-local player_invisabilty = function(event) 
+local player_invisabilty = function(event)
     for i, player in ipairs(game.connected_players) do
         game.connected_players[i].character.health = 500
     end
@@ -186,12 +218,11 @@ end
 local function back_in_car(event)
     local player = game.players[event.player_index]
     if not player.vehicle then
-        local  car = cars[player.name]
+        local car = cars[player.name]
         if car then
             car.set_driver(player)
         end
     end
-    
 end
 
 race:add_map("Race game", -80, -140)
