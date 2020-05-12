@@ -13,13 +13,13 @@ local variables = {}
 local race = Mini_games.new_game("Race_game")
 local token_for_car
 local scores = {}
+local laps = {}
 
 local function setup_areas()
     areas[1] = surface[1].get_script_areas("gate_1_box")[1].area
     areas[2] = surface[1].get_script_areas("gate_2_box")[1].area
     areas[3] = surface[1].get_script_areas("gate_3_box")[1].area
     areas[4] = surface[1].get_script_areas("gate_4_box")[1].area
-    areas[5] = surface[1].get_script_areas("end")[1].area
     local gate_boxes = {}
     gate_boxes[1] = surface[1].get_script_areas("gate_1")[1].area
     gate_boxes[2] = surface[1].get_script_areas("gate_2")[1].area
@@ -36,23 +36,28 @@ local function setup_areas()
 end
 
 local start = function(args)
-    race:add_var(surface)
-    race:add_var(gates)
-    race:add_var(variables)
-    race:add_var(areas)
-    race:add_var(player_progress)
-    race:add_var(cars)
-    race:add_var(fuel)
-    race:add_var(scores)
+    race:add_var(surface,"surface")
+    race:add_var(gates,"gates")
+    race:add_var(variables,"variables")
+    race:add_var(areas,"areas")
+    race:add_var(player_progress,"player_progress")
+    race:add_var(cars,"cars")
+    race:add_var(fuel,"fuel")
+    race:add_var(scores,"scores")
+    race:add_var(laps,"laps")
 
     surface[1] = game.surfaces["Race game"]
     variables["done_left"] = 0
     variables["done_right"] = 0
     variables["left"] = true
-    variables["error_game"] = false
+    variables["error_game"] = nil
     fuel[1] = args[1]
+    variables["laps"] = tonumber(args[2])
+    if not variables["laps"] then 
+        variables["error_game"] = "No laps set"
+    end
     if not game.item_prototypes[fuel[1]] then
-        variables["error_game"] = true
+        variables["error_game"] = "wrong fuel"
     end
 
     for i, player in ipairs(game.connected_players) do
@@ -83,14 +88,18 @@ local start = function(args)
     setup_areas()
 
     if variables["error_game"] then
-        Mini_games.error_in_game("wrong fuel type")
+        Mini_games.error_in_game(variables["error_game"])
     end
 end
 
 local stop = function()
-    game.print("stop")
     for i, car in pairs(cars) do
         car.destroy()
+    end
+    for i,player in ipairs(game.connected_players) do
+        if not player.character then
+            player.create_character()
+        end 
     end
 end
 
@@ -128,18 +137,50 @@ local player_move = function(event)
     end
     if not found_match then
         if insideBox(variables["finsih"], pos) then
-            game.print("hi")
             if player_progress[name] then 
-                game.print("not nil")
                 if player_progress[name] == 5 then
-                    game.print("5")
                     player_progress[name] = 1
-                    --scores[name] = game.tick
-                    player.print(tostring(math.round((game.tick-scores[name])/3600,4)))
+                    if laps[name] then
+                        laps[name] = laps[name] + 1
+                    else
+                        laps[name] = 1 
+                    end
+                    player.print(laps[name])
+                    local finsihed = false
+                    if laps[name] >= variables["laps"] then
+                        cars[name].destroy()
+                        cars[name] = nil
+                        player.character.destroy()
+                        finsihed = true
+                        if  scores[name].totale_time then
+                            scores[name].totale_time = math.round(scores[name].totale_time + (game.tick - scores[name].time),4)
+                        else
+                            scores[name].totale_time = math.round((game.tick - scores[name].time)/60,4)
+                        end
+                        game.print(name.." Has finshed "..variables["laps"].." laps in "..scores[name].totale_time.." seconds"..".")
+                        if scores[1] then
+                            scores[1] =  scores[1] + 1
+                        else
+                            scores[1] = 1
+                        end
+                        if scores[1] >= #game.connected_players then
+                            Mini_games.stop_game()
+                        end
+                    end
+                    if not finsihed then
+                        local time = tostring(math.round((game.tick - scores[name].time)/60,4))
+                        if scores[name].totale_time then
+                            scores[name].totale_time = scores[name].totale_time + (game.tick - scores[name].time)/60
+                        else
+                            scores[name].totale_time =  (game.tick - scores[name].time)/60
+                        end
+                        scores[name].time = game.tick
+                        game.print(name.." Has lapped in: "..time.." seconds. Lap "..laps[name].."/"..variables["laps"]..".")
+                    end
                 end
             else
-                game.print("nil")
-                scores[name] = game.tick
+                scores[name] = {}
+                scores[name].time = game.tick
                 player_progress[name] = 1
             end
         end
@@ -211,7 +252,9 @@ end
 
 local player_invisabilty = function(event)
     for i, player in ipairs(game.connected_players) do
-        game.connected_players[i].character.health = 500
+        if  game.connected_players[i].character then
+            game.connected_players[i].character.health = 500
+        end
     end
 end
 
@@ -232,4 +275,4 @@ race:add_event(defines.events.on_tick, player_invisabilty)
 race:add_event(defines.events.on_player_changed_position, player_move)
 race:add_event(defines.events.on_entity_died, car_destroyed)
 race:add_event(defines.events.on_player_driving_changed_state, back_in_car)
-race:add_option(1)
+race:add_option(2)

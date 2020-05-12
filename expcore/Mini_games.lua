@@ -58,8 +58,8 @@ function Mini_games._prototype:add_onth_tick(tick,func)
     self.onth_tick[#self.onth_tick+1] = {tick,handler}
 end
 
-function Mini_games._prototype:add_var(var)
-    self.vars[#self.vars + 1] = var
+function Mini_games._prototype:add_var(var,name)
+    self.vars[name] = var
 end
 
 function Mini_games._prototype:add_var_global(var)
