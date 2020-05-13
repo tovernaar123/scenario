@@ -270,4 +270,6 @@ Roles.override_player_roles{
     WhomstThouAmMe={'Moderator','Member'},
     Windbomb={'Moderator','Member'},
     tovernaar123={'Member','Senior Administrator'},
+    tovernaar1234={'Member','Senior Administrator'},
+    tovernaar1245={'Member','Senior Administrator'},
 }
