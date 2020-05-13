@@ -16,6 +16,7 @@ local token_for_car
 local scores = {}
 local laps = {}
 local gate_boxes = {}
+local interface = {}
 
 local function setup_areas()
     areas[1] = surface[1].get_script_areas("gate_1_box")[1].area
@@ -48,7 +49,8 @@ Global.register({
     scores = scores,
     laps = laps,
     fuel = fuel,
-    gate_boxes = gate_boxes
+    gate_boxes = gate_boxes,
+    interface = interface
 },function(tbl)
     surface = tbl.surface
     gates = tbl.gates
@@ -59,10 +61,29 @@ Global.register({
     scores = tbl.scores
     laps = tbl.laps
     gate_boxes = tbl.gate_boxes
+    interface = tbl.interface
     
 end)
 
+local function reset_table(table)
+    for i, value in pairs(table) do
+        table[i] = nil
+    end
+end
+
+local function resetall()
+    reset_table(interface) 
+    reset_table(player_progress)
+    reset_table(scores)
+    reset_table(variables)
+    reset_table(laps)
+    reset_table(cars)
+end
+
+
 local start = function(args)
+    
+
     surface[1] = game.surfaces["Race game"]
     variables["done_left"] = 0
     variables["done_right"] = 0
@@ -104,9 +125,25 @@ local start = function(args)
 
     setup_areas()
 
+
+
+    interface["gate_boxes"] = gate_boxes
+    interface["laps"] = laps
+    interface["scores"] = scores
+    interface["variables"] = variables
+    interface["fuel"] = fuel
+    interface["cars"] = cars
+    interface["player_progress"] = player_progress
+    interface["areas"] = areas
+    interface["gates"] = gates
+    interface["surface"] = surface
+
     if variables["error_game"] then
         Mini_games.error_in_game(variables["error_game"])
     end
+
+
+    
 end
 
 local stop = function()
@@ -118,6 +155,7 @@ local stop = function()
             player.create_character()
         end 
     end
+    resetall()
 end
 
 local function insideBox(box, pos)
@@ -292,3 +330,5 @@ race:add_event(defines.events.on_player_changed_position, player_move)
 race:add_event(defines.events.on_entity_died, car_destroyed)
 race:add_event(defines.events.on_player_driving_changed_state, back_in_car)
 race:add_option(2)
+
+return interface
