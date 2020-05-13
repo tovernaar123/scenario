@@ -19,23 +19,28 @@ local gate_boxes = {}
 local interface = {}
 
 local function setup_areas()
-    areas[1] = surface[1].get_script_areas("gate_1_box")[1].area
-    areas[2] = surface[1].get_script_areas("gate_2_box")[1].area
-    areas[3] = surface[1].get_script_areas("gate_3_box")[1].area
-    areas[4] = surface[1].get_script_areas("gate_4_box")[1].area
-
-    gate_boxes[1] = surface[1].get_script_areas("gate_1")[1].area
-    gate_boxes[2] = surface[1].get_script_areas("gate_2")[1].area
-    gate_boxes[3] = surface[1].get_script_areas("gate_3")[1].area
-    gate_boxes[4] = surface[1].get_script_areas("gate_4")[1].area
+    if not areas[1] then
+        areas[1] = surface[1].get_script_areas("gate_1_box")[1].area
+        areas[2] = surface[1].get_script_areas("gate_2_box")[1].area
+        areas[3] = surface[1].get_script_areas("gate_3_box")[1].area
+        areas[4] = surface[1].get_script_areas("gate_4_box")[1].area
+    end
+    if not gate_boxes[1] then
+        gate_boxes[1] = surface[1].get_script_areas("gate_1")[1].area
+        gate_boxes[2] = surface[1].get_script_areas("gate_2")[1].area
+        gate_boxes[3] = surface[1].get_script_areas("gate_3")[1].area
+        gate_boxes[4] = surface[1].get_script_areas("gate_4")[1].area
+    end
 
     variables["finsih"] = surface[1].get_script_areas("finsish_line")[1].area
 
     --gate
-    gates[1] = surface[1].find_entities_filtered {area = gate_boxes[1], name = "gate"}
-    gates[2] = surface[1].find_entities_filtered {area = gate_boxes[2], name = "gate"}
-    gates[3] = surface[1].find_entities_filtered {area = gate_boxes[3], name = "gate"}
-    gates[4] = surface[1].find_entities_filtered {area = gate_boxes[4], name = "gate"}
+    if not gates[1] then
+        gates[1] = surface[1].find_entities_filtered {area = gate_boxes[1], name = "gate"}
+        gates[2] = surface[1].find_entities_filtered {area = gate_boxes[2], name = "gate"}
+        gates[3] = surface[1].find_entities_filtered {area = gate_boxes[3], name = "gate"}
+        gates[4] = surface[1].find_entities_filtered {area = gate_boxes[4], name = "gate"}
+    end
 end
 
 

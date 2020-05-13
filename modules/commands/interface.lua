@@ -6,8 +6,6 @@
 local Commands = require 'expcore.commands' --- @dep expcore.commands
 local Global = require 'utils.global' --- @dep utils.global
 local Common = require 'expcore.common' --- @dep expcore.common
-local Mini_games = require "expcore.Mini_games"
-
 -- modules that are loaded into the interface env to be accessed
 local interface_modules = {
     ['Game']='utils.game',
@@ -19,7 +17,8 @@ local interface_modules = {
     ['Store']='expcore.store',
     ['Gui']='expcore.gui',
     ['Race_game']='modules.mini-games.Race',
-    ['Sudo']='expcore.sudo'
+    ['Sudo']='expcore.sudo',
+
 }
 
 -- loads all the modules given in the above table
