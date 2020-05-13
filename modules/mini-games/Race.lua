@@ -247,20 +247,20 @@ local player_move = function(event)
     end
 end
 
-local stop_invins = function()
-    variables[5].force = "player"
+local stop_invins = function(name)
+    variables["Dead_car"][name].force = "player"
 end
 
-local kill_biters = function()
-    local biters = surface[1].find_enemy_units(variables[2], 3, "player")
+local kill_biters = function(name)
+    local biters = surface[1].find_enemy_units(variables["Dead_car"][name].position, 3, "player")
     for i, biter in ipairs(biters) do
         biter.destroy()
     end
 end
 
-local function invisabilty(car)
+local function invisabilty(car,name)
     car.force = "enemy"
-    local biters = surface[1].find_enemy_units(variables[2], 50, "player")
+    local biters = surface[1].find_enemy_units(variables["Dead_car"][name].position, 50, "player")
     for i, biter in ipairs(biters) do
         biter.set_command({type = defines.command.flee, from = car})
     end
@@ -271,24 +271,24 @@ local token_for_stop_invins = Token.register(stop_invins)
 local token_for_kill_biters = Token.register(kill_biters)
 
 
-local respawn_car = function()
-    local player = variables[1]
+local respawn_car = function(name)
+    local player = variables["Dead_car"][name].player
     local car =
         surface[1].create_entity {
         name = "car",
         direction = defines.direction.north,
-        position = variables[2],
+        position = variables["Dead_car"][name].position,
         force = "player"
     }
     car.set_driver(player)
-    car.orientation = variables[3]
+    car.orientation = variables["Dead_car"][name].orientation
     car.get_fuel_inventory().insert({name = fuel[1], count = 100})
-    cars[variables[1].name] = car
+    cars[name] = car
 
-    Permission_Groups.set_player_group(player, variables[4])
-    invisabilty(car)
+    Permission_Groups.set_player_group(player, variables["Dead_car"][name].group)
+    invisabilty(car,name)
 
-    variables[5] = car
+    variables["Dead_car"][name].car = car
 end
 
 token_for_car = Token.register(respawn_car)
@@ -298,14 +298,21 @@ local car_destroyed = function(event)
     local dead_car = event.entity
     if dead_car.name == "car" then
         local player = dead_car.get_driver().player
-        variables[1] = player
-        variables[2] = dead_car.position
-        variables[3] = dead_car.orientation
-        variables[4] = Permission_Groups.get_group_from_player(player).name
+        local name = player.name
+        if not variables["Dead_car"] then
+            variables["Dead_car"] = {}
+        end
+        if not variables["Dead_car"][name] then
+            variables["Dead_car"][name] = {}
+        end
+        variables["Dead_car"][name].player = player
+        variables["Dead_car"][name].position = dead_car.position
+        variables["Dead_car"][name].orientation = dead_car.orientation
+        variables["Dead_car"][name].group = Permission_Groups.get_group_from_player(player).name
         Permission_Groups.set_player_group(player, "out_car")
-        task.set_timeout_in_ticks(180, token_for_car)
-        task.set_timeout_in_ticks(190, token_for_kill_biters)
-        task.set_timeout_in_ticks(480, token_for_stop_invins)
+        task.set_timeout_in_ticks(180, token_for_car,name)
+        task.set_timeout_in_ticks(190, token_for_kill_biters,name)
+        task.set_timeout_in_ticks(480, token_for_stop_invins,name)
     end
 end
 
