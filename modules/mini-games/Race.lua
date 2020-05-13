@@ -248,7 +248,7 @@ local player_move = function(event)
 end
 
 local stop_invins = function(name)
-    variables["Dead_car"][name].force = "player"
+    variables["Dead_car"][name].car.force = "player"
 end
 
 local kill_biters = function(name)
