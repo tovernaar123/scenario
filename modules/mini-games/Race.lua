@@ -1,9 +1,9 @@
-local Mini_games = require "expcore.Mini_games"
---local Event = require "utils.event"
-local Token = require "utils.token"
-local task = require "utils.task"
+local Mini_games        = require "expcore.Mini_games"
+local Token             = require "utils.token"
+local task              = require "utils.task"
 local Permission_Groups = require "expcore.permission_groups"
-local Global = require 'utils.global' --Used to prevent desynicing.
+local Global            = require 'utils.global' --Used to prevent desynicing.
+local interface         = require 'modules.commands.interface'
 local surface = {}
 local gates = {}
 local areas = {}
@@ -382,13 +382,21 @@ local function on_player_left_game(event)
     local player = game.players[event.player_index]
     if not start_players[player.name] then
         variables["new_joins"] = variables["new_joins"] - 1
+    else
+        local name = player.name 
+        start_players[name] = nil
+        scores[name] = nil
+        player_progress[name] = nil
+        player.character.destructible = true 
+
     end
     if not player.character then
         player.create_character()
     end 
     player.teleport({-35,55},"nauvis")
+
     if cars[player.name] then
-        cars[player.name].destory()
+        cars[player.name].destroy()
     end
 
 end
@@ -406,7 +414,8 @@ race:add_event(defines.events.on_pre_player_left_game, on_player_left_game)
 race:add_option(2)
 
 
-return function()
+
+local function give_vars()
     return {
       surface ,
       gates,
@@ -420,3 +429,4 @@ return function()
       start_players 
     }
 end
+interface.add_interface_callback('Race',function(player) return give_vars() end)    

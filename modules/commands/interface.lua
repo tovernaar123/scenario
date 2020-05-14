@@ -105,7 +105,6 @@ add_interface_callback('surface',function(player) return player.surface end)
 add_interface_callback('force',function(player) return player.force end)
 add_interface_callback('position',function(player) return player.position end)
 add_interface_callback('entity',function(player) return player.selected end)
-add_interface_callback('Race',function(player) return Race_game() end)    
 add_interface_callback('tile',function(player) return player.surface.get_tile(player.position) end)
 
 return {
