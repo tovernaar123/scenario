@@ -90,6 +90,7 @@ local function race_count_down()
         for i,player_name in pairs(start_players) do
             local car = cars[player_name]
             car.get_fuel_inventory().insert({name = variables["fuel"], count = 100})   
+            scores[player_name].time = game.tick
         end
     else
         task.set_timeout_in_ticks(60, token_for_start)
@@ -145,7 +146,6 @@ local start = function(args)
 
         local name = player.name
         scores[name] = {}
-        scores[name].time = game.tick
         player_progress[name] = 1
         player.character.destructible = false 
 
@@ -226,6 +226,25 @@ local player_move = function(event)
                         end
                         if progress == i and progress ~= 5 then
                             player_progress[name] = player_progress[name] + 1
+                        end
+                    end
+                end
+            end
+            if not found_match then
+                if insideBox(gate_boxes[4], pos) then
+                    if player_progress[name] < 5 then 
+                        local car = cars[name]
+                        if car then
+                            if car.valid then
+                                car.teleport({276,-406})
+                                car.orientation = 0.25
+                                player_progress[name] = 1
+                                player.print("[font=default-bold]YOU CAN'T TAKE A SHURTCUT, CHEATER![/font]")
+                            end
+                        else
+                            variables["Dead_car"][name].position = {276,-406}
+                            variables["Dead_car"][name].orientation = 0.25
+                            player.print("[font=default-bold]YOU CAN'T TAKE A SHURTCUT, CHEATER![/font]")
                         end
                     end
                 end
@@ -417,16 +436,16 @@ race:add_option(2)
 
 local function give_vars()
     return {
-      surface ,
-      gates,
-      variables,
-      areas,
-      player_progress,
-      cars,
-      scores,
-      laps,
-      gate_boxes,
-      start_players 
+        surface=surface ,
+        gates=gates,
+        variables=variables,
+        areas=areas,
+        player_progress=player_progress,
+        cars=cars,
+        scores=scores,
+        laps=laps,
+        gate_boxes=gate_boxes,
+        start_players=start_players 
     }
 end
-interface.add_interface_callback('Race',function(player) return give_vars() end)    
+interface.add_interface_callback('Race',function(player) return give_vars() end)
