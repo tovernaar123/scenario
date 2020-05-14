@@ -15,7 +15,6 @@ local token_for_car
 local scores = {}
 local laps = {}
 local gate_boxes = {}
-local interface = {}
 local start_players ={}
 
 local function setup_areas()
@@ -45,17 +44,16 @@ end
 
 
 Global.register({
-    surface = surface,
-    gates = gates,
-    variables = variables,
-    areas = areas,
-    player_progress = player_progress,
-    cars = cars,
-    scores = scores,
-    laps = laps,
-    gate_boxes = gate_boxes,
-    interface = interface,
-    start_players = start_players
+    surface = surface, --y
+    gates = gates, --y
+    variables = variables, --y
+    areas = areas, --y
+    player_progress = player_progress, --y
+    cars = cars, --y
+    scores = scores, --y
+    laps = laps, --y 
+    gate_boxes = gate_boxes, --y
+    start_players = start_players --y
 },function(tbl)
     surface = tbl.surface
     gates = tbl.gates
@@ -66,7 +64,6 @@ Global.register({
     scores = tbl.scores
     laps = tbl.laps
     gate_boxes = tbl.gate_boxes
-    interface = tbl.interface
     start_players = tbl.start_players
     
 end)
@@ -78,7 +75,6 @@ local function reset_table(table)
 end
 
 local function resetall()
-    reset_table(interface) 
     reset_table(player_progress)
     reset_table(scores)
     reset_table(variables)
@@ -142,15 +138,7 @@ local start = function(args)
 
     setup_areas()
 
-    interface["gate_boxes"] = gate_boxes
-    interface["laps"] = laps
-    interface["scores"] = scores
-    interface["variables"] = variables
-    interface["cars"] = cars
-    interface["player_progress"] = player_progress
-    interface["areas"] = areas
-    interface["gates"] = gates
-    interface["surface"] = surface
+
 
     if variables["error_game"] then
         Mini_games.error_in_game(variables["error_game"])
@@ -235,7 +223,7 @@ local player_move = function(event)
                             laps[name] = 1 
                         end
                         local finsihed = false
-                        if laps[name] >= variables["laps"] then --todo add laps into scores
+                        if laps[name] >= variables["laps"] then 
                             cars[name].destroy()
                             cars[name] = nil
                             player.character.destroy()
@@ -346,9 +334,8 @@ local car_destroyed = function(event)
 end
 
 local player_invisabilty = function(event)
-    local player = event.entity.player 
     local entity = event.entity
-    if player then
+    if entity.player then
         entity.health = 1000
     end
 end
@@ -388,7 +375,7 @@ end
 race:add_map("Race game", -80, -140)
 race:add_start_function(start)
 race:add_stop_function(stop)
-race:add_event(defines.events.on_entity_damaged, player_invisabilty)
+--race:add_event(defines.events.on_entity_damaged, player_invisabilty)
 race:add_event(defines.events.on_player_changed_position, player_move)
 race:add_event(defines.events.on_entity_died, car_destroyed)
 race:add_event(defines.events.on_player_driving_changed_state, back_in_car)
@@ -396,4 +383,15 @@ race:add_event(defines.events.on_player_joined_game, player_join)
 race:add_event(defines.events.on_player_left_game, on_player_left_game)
 race:add_option(2)
 
-return interface
+return {
+    surface ,
+    gates,
+    variables,
+    areas,
+    player_progress,
+    cars,
+    scores,
+    laps,
+    gate_boxes,
+    start_players 
+}
