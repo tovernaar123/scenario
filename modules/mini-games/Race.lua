@@ -380,7 +380,7 @@ race:add_event(defines.events.on_player_changed_position, player_move)
 race:add_event(defines.events.on_entity_died, car_destroyed)
 race:add_event(defines.events.on_player_driving_changed_state, back_in_car)
 race:add_event(defines.events.on_player_joined_game, player_join)
-race:add_event(defines.events.on_player_left_game, on_player_left_game)
+race:add_event(defines.events.on_pre_player_left_game, on_player_left_game)
 race:add_option(2)
 
 return {
