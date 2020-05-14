@@ -81,13 +81,28 @@ local function resetall()
     reset_table(laps)
     reset_table(cars)
 end
+local token_for_start 
 
+local function race_count_down()
+    variables["count_down"]  = variables["count_down"]  -1
+    game.print("[color=red]"..variables["count_down"].."[/color]")
+    if variables["count_down"] == 0 then
+        for i,player_name in pairs(start_players) do
+            local car = cars[player_name]
+            car.get_fuel_inventory().insert({name = variables["fuel"], count = 100})   
+        end
+    else
+        task.set_timeout_in_ticks(60, token_for_start)
+    end
+end
+token_for_start = Token.register(race_count_down)
 
 local start = function(args)
     
 
     surface[1] = game.surfaces["Race game"]
     variables["done_left"] = 0
+    variables["count_down"] = 11
     variables["done_right"] = 0
     variables["left"] = true
     variables["error_game"] = nil
@@ -124,7 +139,7 @@ local start = function(args)
         }
         if not variables["error_game"] then
             car.set_driver(game.connected_players[i])
-            car.get_fuel_inventory().insert({name = variables["fuel"], count = 100})
+            --car.get_fuel_inventory().insert({name = variables["fuel"], count = 100})
         end
         cars[player.name] = car
 
@@ -135,7 +150,11 @@ local start = function(args)
         player.character.destructible = false 
 
     end
-
+    local laps = variables["laps"]
+    game.print("Race started!")
+    game.print("Racing in a car with "..variables["fuel"]..".")
+    game.print("Laps: "..laps..".")
+    task.set_timeout_in_ticks(10, token_for_start)
     setup_areas()
 
 
@@ -368,6 +387,9 @@ local function on_player_left_game(event)
         player.create_character()
     end 
     player.teleport({-35,55},"nauvis")
+    if cars[player.name] then
+        cars[player.name].destory()
+    end
 
 end
 
