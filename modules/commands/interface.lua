@@ -6,6 +6,7 @@
 local Commands = require 'expcore.commands' --- @dep expcore.commands
 local Global = require 'utils.global' --- @dep utils.global
 local Common = require 'expcore.common' --- @dep expcore.common
+local Race_game = require 'modules.mini-games.Race'
 -- modules that are loaded into the interface env to be accessed
 local interface_modules = {
     ['Game']='utils.game',
@@ -16,7 +17,7 @@ local interface_modules = {
     ['Roles']='expcore.roles',
     ['Store']='expcore.store',
     ['Gui']='expcore.gui',
-    ['Race_game']='modules.mini-games.Race',
+    ['Race_game']=Race_game,
     ['Sudo']='expcore.sudo',
 
 }
@@ -104,6 +105,7 @@ add_interface_callback('surface',function(player) return player.surface end)
 add_interface_callback('force',function(player) return player.force end)
 add_interface_callback('position',function(player) return player.position end)
 add_interface_callback('entity',function(player) return player.selected end)
+add_interface_callback('Race',function(player) return Race_game() end)    
 add_interface_callback('tile',function(player) return player.surface.get_tile(player.position) end)
 
 return {

@@ -383,15 +383,18 @@ race:add_event(defines.events.on_player_joined_game, player_join)
 race:add_event(defines.events.on_pre_player_left_game, on_player_left_game)
 race:add_option(2)
 
-return {
-    surface ,
-    gates,
-    variables,
-    areas,
-    player_progress,
-    cars,
-    scores,
-    laps,
-    gate_boxes,
-    start_players 
-}
+
+return function()
+    return {
+      surface ,
+      gates,
+      variables,
+      areas,
+      player_progress,
+      cars,
+      scores,
+      laps,
+      gate_boxes,
+      start_players 
+    }
+end
