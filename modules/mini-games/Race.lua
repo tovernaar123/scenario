@@ -86,9 +86,13 @@ end
 local token_for_start 
 
 local function race_count_down()
+    
     variables["count_down"]  = variables["count_down"]  -1
-    game.print("[color=red]"..variables["count_down"].."[/color]")
+    if  variables["count_down"] ~= 0 then
+        game.print("[color=red]"..variables["count_down"].."[/color]")
+    end
     if variables["count_down"] == 0 then
+        game.print("[color=green]0 --> GO![/color]")
         for i,player_name in pairs(start_players) do
             local car = cars[player_name]
             car.get_fuel_inventory().insert({name = variables["fuel"], count = 100})   
@@ -307,6 +311,8 @@ local player_move = function(event)
                                 player.character.destroy()
                             end
                             finsihed = true
+                            local time = tostring(math.round((game.tick - scores[name].time)/60,4))
+                            game.print(name.." Has lapped in: "..time.." seconds. Lap "..laps[name].."/"..variables["laps"]..".")
                             if  scores[name].totale_time then
                                 scores[name].totale_time = math.round(scores[name].totale_time + (game.tick - scores[name].time)/60,4)
                             else
