@@ -182,9 +182,9 @@ local start = function(args)
         end
     end
     local laps = variables["laps"]
-    game.print("Race started!")
-    game.print("Racing in a car with "..variables["fuel"]..".")
-    game.print("Laps: "..laps..".")
+    game.print("[color=#39ff14]Race started![/color]")
+    game.print("[color=#39ff14]Racing in a car with "..variables["fuel"]..".[/color]")
+    game.print("[color=#39ff14]Laps: "..laps..".[/color]")
     task.set_timeout_in_ticks(10, token_for_start)
     setup_areas()
 
@@ -224,7 +224,7 @@ local stop = function()
         local place = value[1]
         local time = value[2]
         local place = Nth(place)
-        game.print(place..": "..i.." with "..time.." seconds.")
+        game.print("[color=#39ff14]"..place..": "..i.." with "..time.." seconds.[/color]")
     end
     resetall()
 end
