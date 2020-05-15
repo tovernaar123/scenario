@@ -219,12 +219,20 @@ local stop = function()
             player.create_character()
         end 
     end
-
+    local colors =  {
+        ["1st"] = "[color=#FFD700]",
+        ["2nd"] = "[color=#C0C0C0]",
+        ["3rd"] = "[color=#cd7f32]"
+    }
     for i, value in pairs(scores["finshed_times"]) do
         local place = value[1]
         local time = value[2]
         local place = Nth(place)
-        game.print("[color=#39ff14]"..place..": "..i.." with "..time.." seconds.[/color]")
+        if colors[place] then
+            game.print(colors[place]..place..": "..i.." with "..time.." seconds.[/color]")
+        else
+            game.print("[color=#808080]"..place..": "..i.." with "..time.." seconds.[/color]")
+        end
     end
     resetall()
 end
