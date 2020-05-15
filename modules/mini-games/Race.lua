@@ -75,11 +75,13 @@ local function reset_table(table)
 end
 
 local function resetall()
-    reset_table(player_progress)
-    reset_table(scores)
+    reset_table(surface)
     reset_table(variables)
-    reset_table(laps)
+    reset_table(player_progress)
     reset_table(cars)
+    reset_table(scores)
+    reset_table(laps)
+    reset_table(start_players)
 end
 local token_for_start 
 
@@ -98,6 +100,16 @@ local function race_count_down()
 end
 token_for_start = Token.register(race_count_down)
 
+local function pick_player()
+    local player = game.connected_players[math.random(#game.connected_players)]
+    if not start_players[player.name] then
+        return player
+    else 
+        return  pick_player()
+    end
+end
+
+
 local start = function(args)
     
 
@@ -109,6 +121,7 @@ local start = function(args)
     variables["error_game"] = nil
     variables["fuel"] = args[1]
     variables["laps"] = tonumber(args[2])
+    variables["player"] = tonumber(args[3])
     variables["place"] = 1
     variables["new_joins"] = 0
     scores["finshed_times"] = {}
@@ -118,8 +131,19 @@ local start = function(args)
     if not game.item_prototypes[variables["fuel"]] then
         variables["error_game"] = "wrong fuel"
     end
-
-    for i, player in ipairs(game.connected_players) do
+    local pick_all = false
+    if variables["player"] >= #game.connected_players then
+        pick_all = true
+        variables["player"] =  #game.connected_players
+    end
+    --for i, player in ipairs(game.connected_players) do
+    for i=1,variables["player"] do
+        local player 
+        if pick_all then
+            player = game.connected_players[i]
+        else
+            player = pick_player()
+        end
         start_players[player.name] = player.name 
         local pos
         if (variables["left"]) then
@@ -139,15 +163,21 @@ local start = function(args)
             force = "player"
         }
         if not variables["error_game"] then
-            car.set_driver(game.connected_players[i])
+            car.set_driver(game.players[player.name])
             --car.get_fuel_inventory().insert({name = variables["fuel"], count = 100})
         end
-        cars[player.name] = car
+        for i, player in ipairs(game.connected_players) do
+            if not  start_players[player.name]  then
+                local player = game.players[player.name]
+                player.character.destroy()
+                variables["new_joins"] = variables["new_joins"] + 1   
+            end
+        end
 
+        cars[player.name] = car
         local name = player.name
         scores[name] = {}
         player_progress[name] = 1
-        player.character.destructible = false 
 
     end
     local laps = variables["laps"]
@@ -303,7 +333,9 @@ local player_move = function(event)
 end
 
 local stop_invins = function(name)
-    variables["Dead_car"][name].car.force = "player"
+    variables["Dead_car"][name].car.destructible = true
+    local player = variables["Dead_car"][name].player
+    player.character.destructible = true 
 end
 
 local kill_biters = function(name)
@@ -314,10 +346,10 @@ local kill_biters = function(name)
 end
 
 local function invisabilty(car,name)
-    car.force = "enemy"
+    car.destructible = false
     local biters = surface[1].find_enemy_units(variables["Dead_car"][name].position, 50, "player")
     for i, biter in ipairs(biters) do
-        biter.set_command({type = defines.command.flee, from = car})
+        biter.set_command({type = defines.command.flee, distraction  = defines.distraction.by_anything, from = car})
     end
 end
 
@@ -364,6 +396,7 @@ local car_destroyed = function(event)
         variables["Dead_car"][name].position = dead_car.position
         variables["Dead_car"][name].orientation = dead_car.orientation
         variables["Dead_car"][name].group = Permission_Groups.get_group_from_player(player).name
+        player.character.destructible = false 
         Permission_Groups.set_player_group(player, "out_car")
         task.set_timeout_in_ticks(180, token_for_car,name)
         task.set_timeout_in_ticks(190, token_for_kill_biters,name)
@@ -413,7 +446,6 @@ local function on_player_left_game(event)
         player.create_character()
     end 
     player.teleport({-35,55},"nauvis")
-
     if cars[player.name] then
         cars[player.name].destroy()
     end
@@ -430,7 +462,7 @@ race:add_event(defines.events.on_entity_died, car_destroyed)
 race:add_event(defines.events.on_player_driving_changed_state, back_in_car)
 race:add_event(defines.events.on_player_joined_game, player_join)
 race:add_event(defines.events.on_pre_player_left_game, on_player_left_game)
-race:add_option(2)
+race:add_option(3)
 
 
 
@@ -448,4 +480,5 @@ local function give_vars()
         start_players=start_players 
     }
 end
+
 interface.add_interface_callback('Race',function(player) return give_vars() end)
