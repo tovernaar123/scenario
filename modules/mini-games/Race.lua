@@ -308,7 +308,7 @@ local player_move = function(event)
                             end
                             finsihed = true
                             if  scores[name].totale_time then
-                                scores[name].totale_time = math.round(scores[name].totale_time + (game.tick - scores[name].time),4)
+                                scores[name].totale_time = math.round(scores[name].totale_time + (game.tick - scores[name].time)/60,4)
                             else
                                 scores[name].totale_time = math.round((game.tick - scores[name].time)/60,4)
                             end
