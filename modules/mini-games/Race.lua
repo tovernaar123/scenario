@@ -166,19 +166,20 @@ local start = function(args)
             car.set_driver(game.players[player.name])
             --car.get_fuel_inventory().insert({name = variables["fuel"], count = 100})
         end
-        for i, player in ipairs(game.connected_players) do
-            if not  start_players[player.name]  then
-                local player = game.players[player.name]
-                player.character.destroy()
-                variables["new_joins"] = variables["new_joins"] + 1   
-            end
-        end
 
         cars[player.name] = car
         local name = player.name
         scores[name] = {}
         player_progress[name] = 1
 
+    end
+
+    for i, player in ipairs(game.connected_players) do
+        if not  start_players[player.name]  then
+            local player = game.players[player.name]
+            player.character.destroy()
+            variables["new_joins"] = variables["new_joins"] + 1   
+        end
     end
     local laps = variables["laps"]
     game.print("Race started!")
@@ -294,7 +295,9 @@ local player_move = function(event)
                         if laps[name] >= variables["laps"] then 
                             cars[name].destroy()
                             cars[name] = nil
-                            player.character.destroy()
+                            if player.character then
+                                player.character.destroy()
+                            end
                             finsihed = true
                             if  scores[name].totale_time then
                                 scores[name].totale_time = math.round(scores[name].totale_time + (game.tick - scores[name].time),4)
