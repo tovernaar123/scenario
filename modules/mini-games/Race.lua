@@ -119,7 +119,7 @@ local start = function(args)
 
     surface[1] = game.surfaces["Race game"]
     variables["done_left"] = 0
-    variables["count_down"] = 11
+    variables["count_down"] = 4
     variables["done_right"] = 0
     variables["left"] = true
     variables["error_game"] = nil
