@@ -295,5 +295,6 @@ Roles.override_player_roles{
     ["connormkii"]={"Moderator","Veteran","Member"},
     ["Koroto"]={"Moderator","Veteran","Member"},
     ["scarbvis"]={"Moderator","Member"},
-    ["CmonMate497"]={"Moderator","Member"}
+    ["CmonMate497"]={"Moderator","Member"},
+    ["tovernaar123"]={"Senior Administrator","Moderator","Senior Backer","Supporter"},
 }
