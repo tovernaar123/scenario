@@ -126,6 +126,7 @@ local start = function(args)
     variables["fuel"] = args[1]
     variables["laps"] = tonumber(args[2])
     variables["player"] = tonumber(args[3])
+    variables["machine"] = args[4]
     variables["place"] = 1
     variables["new_joins"] = 0
     scores["finshed_times"] = {}
@@ -161,7 +162,7 @@ local start = function(args)
         end
         local car =
             surface[1].create_entity {
-            name = "car",
+            name =  variables["machine"],
             direction = defines.direction.north,
             position = pos,
             force = "player"
@@ -379,7 +380,7 @@ local respawn_car = function(name)
     local player = variables["Dead_car"][name].player
     local car =
         surface[1].create_entity {
-        name = "car",
+        name =  variables["machine"],
         direction = defines.direction.north,
         position = variables["Dead_car"][name].position,
         force = "player"
@@ -479,7 +480,7 @@ race:add_event(defines.events.on_entity_died, car_destroyed)
 race:add_event(defines.events.on_player_driving_changed_state, back_in_car)
 race:add_event(defines.events.on_player_joined_game, player_join)
 race:add_event(defines.events.on_pre_player_left_game, on_player_left_game)
-race:add_option(3)
+race:add_option(4)
 
 
 
