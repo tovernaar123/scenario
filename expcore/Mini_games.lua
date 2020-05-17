@@ -192,12 +192,76 @@ function Mini_games.stop_game()
 
 end
 
-
 function Mini_games.error_in_game(error_game)
     --error(error_game)   
     Mini_games.stop_game()
     game.print("an error has occured things may be broken, error: "..error_game)
 end
+
+
+
+-- gui
+
+
+local vote_label =
+Gui.element{
+    type = "label",
+    caption = 'races',
+    style ="heading_1_label"
+
+}
+
+local vote_button =
+Gui.element{
+    type = 'sprite-button',
+    sprite = 'utility/check_mark',
+    style = 'quick_bar_slot_button',   
+}
+:on_click(function(player,element,event)
+    game.print("hi")
+end)
+
+
+local add_mini_game =
+Gui.element(function(_,parent)
+    local vote_flow = parent.add{ type = 'flow', }
+    vote_flow.style.padding = 0
+    vote_button(vote_flow)
+    --vote_label(parent)
+    return parent.add{
+        type = "label",
+        caption = 'races',
+        style ="heading_1_label"
+    }
+end)
+
+
+
+local mini_game_list = 
+Gui.element(function(event_trigger,parent,...)
+    local container = Gui.container(parent,event_trigger,200)
+    local header = Gui.header(
+        container,
+        "Vote",
+        "Here is where to vote",
+        true
+    )
+    local scroll_table = Gui.scroll_table(container,250,2)
+    local scroll_table_style = scroll_table.style 
+    scroll_table_style.top_cell_padding = 3
+    scroll_table_style.bottom_cell_padding = 3
+    add_mini_game(scroll_table)
+    add_mini_game(scroll_table)
+    
+
+
+    
+end)
+:add_to_left_flow(false)
+Gui.left_toolbar_button('entity/inserter','Nothing to see here',mini_game_list)
+
+
+
 --[[
 local example_button =
 Gui.element{
@@ -205,14 +269,11 @@ Gui.element{
     caption = 'Example Button'
 }
 :on_click(function(player,element,event)
-    -- player is the player who interacted with the element to cause the event
-    -- element is a refrence to the element which caused the event
-     --event is a raw refrence to the event data if player and element are not enough
     game.print("lol")
 end)
 :add_to_left_flow(true)
-Gui.left_toolbar_button('entity/inserter', 'Nothing to see here', example_button)
-
---left_toolbar_button
+Gui.container('entity/inserter', 'Nothing to see here', example_button)
 ]]
+--left_toolbar_button
+
 return Mini_games
